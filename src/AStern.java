@@ -1,7 +1,10 @@
 import java.awt.Point;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 
 import apoSkunkman.ai.ApoSkunkmanAIConstants;
 
@@ -9,12 +12,13 @@ public class AStern {
 
     private byte[][] level;
 
-    private ArrayList<ApoPoint> openList = new ArrayList<ApoPoint>(1000);
+    private ArrayList<ApoPoint> openList;
 
     private Point goal;
 
     public AStern(Point start, Point goal, byte[][] level) {
         ApoPoint ap = new ApoPoint(start, null, goal, 0.0);
+        openList = new ArrayList<ApoPoint>(1000);
         openList.add(ap);
         this.goal = goal;
         this.level = level;
@@ -27,54 +31,60 @@ public class AStern {
         ApoPoint current = null;
         do {
             // search for minimal cost
-            current = openList.remove(getMin());
-            if (current.getPoint().equals(goal))
+            current = Collections.min(openList);
+            openList.remove(current);
+            if (current.getPoint().equals(goal)) {
+                System.out.println("Ziel gefunden!");
                 break;
+            }
             closedList.add(current);
 
             ApoPoint[] possibilities = getPossibilites(current);
             for (ApoPoint pos : possibilities) {
-                if (pos == null)
+                if (pos == null || closedList.contains(pos))
                     continue;
                 int index = openList.indexOf(pos);
                 if (index != -1) {
                     ApoPoint old = openList.get(index);
-                    if (pos.getG() < old.getG())
-                        old.setPrevious(pos.getPrevious());
+                    if (pos.getG() < old.getG()) {
+                        pos.setPrevious(current);
+                    }
                     continue;
                 }
-
-                index = closedList.indexOf(pos);
-                if (index != -1)
-                    continue;
 
                 openList.add(pos);
             }
         }
         while (!openList.isEmpty());
+        writeFile();
     }
 
-    public ArrayList<ApoPoint> getPath() {
+    private void writeFile() {
+        LinkedList<Point> result = getPath();
+        try {
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter(
+                    "C:/Users/Meldanor/Desktop/result.txt"));
+            for (Point p : result) {
+                bWriter.write("(" + p.x + "," + p.y + ")");
+                bWriter.newLine();
+            }
+            bWriter.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public LinkedList<Point> getPath() {
         if (openList.isEmpty())
             return null;
-        Collections.reverse(openList);
-        return openList;
-    }
+        LinkedList<Point> result = new LinkedList<Point>();
+        for (int i = openList.size() - 1; i >= 0; --i)
+            result.add(openList.get(i).getPrevious().getPoint());
 
-    public int getMin() {
-
-        double minF = openList.get(0).getF();
-        double minH = openList.get(0).getH();
-        int index = 0;
-        for (int i = 1; i < openList.size(); ++i) {
-            ApoPoint apo = openList.get(0);
-            if (apo.getF() < minF || (apo.getF() == minF && apo.getH() < minH)) {
-                index = i;
-                minF = apo.getF();
-                minH = apo.getH();
-            }
-        }
-        return index;
+        result.add(goal);
+        return result;
     }
 
     public ApoPoint[] getPossibilites(ApoPoint current) {

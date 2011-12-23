@@ -1,6 +1,6 @@
 import java.awt.Point;
 
-public class ApoPoint {
+public class ApoPoint implements Comparable<ApoPoint> {
 
     private ApoPoint previous;
     private Point p;
@@ -61,4 +61,14 @@ public class ApoPoint {
         return "(" + p.x + "," + p.y + ")" + " " + getG() + " " + getF() + " "
                 + getH();
     }
+
+    public int compareTo(ApoPoint o) {
+
+        if (this.getF() < o.getF())
+            return -1;
+        if (this.getF() > o.getF())
+            return 1;
+        return this.getH() <= o.getH() ? -1 : 1;
+    }
+
 }

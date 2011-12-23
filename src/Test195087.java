@@ -1,5 +1,6 @@
+import java.awt.Color;
 import java.awt.Point;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import apoSkunkman.ai.ApoSkunkmanAI;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
@@ -13,7 +14,7 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  */
 public class Test195087 extends ApoSkunkmanAI {
 
-    private ArrayList<ApoPoint> path = new ArrayList<ApoPoint>(100);
+    private LinkedList<Point> path;
     private int index = -1;
 
     @Override
@@ -48,8 +49,13 @@ public class Test195087 extends ApoSkunkmanAI {
             return;
 
         else {
+            if (index != -3) {
+                System.out.println("LOL");
+                visualizeWay(player);
+                index = -3;
+            }
             System.out.println("Hab gefunden");
-            moveToPoint(player, path.get(index++).getPoint());
+            moveToPoint(player, path.removeFirst());
 
         }
     }
@@ -69,5 +75,10 @@ public class Test195087 extends ApoSkunkmanAI {
             else
                 player.movePlayerUp();
         }
+    }
+
+    private void visualizeWay(ApoSkunkmanAIPlayer player) {
+        for (Point p : path)
+            player.drawRect(p.x * 20, p.y * 20, 5, 5, true, 10, Color.BLUE);
     }
 }
