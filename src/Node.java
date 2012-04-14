@@ -20,6 +20,8 @@ public class Node extends Point implements Comparable<Node> {
 
     private double F;
 
+    private Node prev;
+
     public Node(int x, int y) {
         super(x, y);
     }
@@ -49,6 +51,10 @@ public class Node extends Point implements Comparable<Node> {
 
     }
 
+    public void setPrev(Node prev) {
+        this.prev = prev;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof Node))
@@ -56,8 +62,12 @@ public class Node extends Point implements Comparable<Node> {
         if (obj == this)
             return true;
 
-        Node that = (Node) obj;
-        return this.x == that.x && this.y == that.x && this.G == that.G && this.H == that.H;
+        return super.equals(obj);
 
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

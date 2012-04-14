@@ -8,11 +8,16 @@
  * begegnen.
  */
 
+import java.awt.Point;
+import java.util.LinkedList;
+
 import apoSkunkman.ai.ApoSkunkmanAI;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class Meldanor extends ApoSkunkmanAI {
+
+    private LinkedList<Node> path;
 
     @Override
     public String getPlayerName() {
@@ -26,8 +31,37 @@ public class Meldanor extends ApoSkunkmanAI {
 
     @Override
     public void think(ApoSkunkmanAILevel level, ApoSkunkmanAIPlayer player) {
-        player.movePlayerDown();
+        if (path == null)
+            findWay(level.getLevelAsByte(), player, level);
+        else if (!path.isEmpty())
+            moveTo(player, path.removeFirst());
+        else
+            throw new RuntimeException("Empty path but no goal :(");
 
     }
+    private void findWay(byte[][] LinkedList, ApoSkunkmanAIPlayer player, ApoSkunkmanAILevel level) {
+        AStar pathFinder = new AStar(LinkedList, new Point((int) player.getX(), (int) player.getY()), level.getGoalXPoint());
+        pathFinder.calculate();
+        path = pathFinder.getWay();
+    }
 
+    private void moveTo(ApoSkunkmanAIPlayer player, Point p) {
+
+        // CALCULATE DIRECTION
+        int diff = p.x - (int) player.getX();
+
+        // CHECK X-AXIS
+        if (diff > 0)
+            player.movePlayerRight();
+        else if (diff < 0)
+            player.movePlayerLeft();
+        else {
+            // CHECK Y-AXIS
+            diff = p.y - (int) player.getY();
+            if (diff > 0)
+                player.movePlayerDown();
+            else if (diff < 0)
+                player.movePlayerUp();
+        }
+    }
 }
