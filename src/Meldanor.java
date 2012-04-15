@@ -31,15 +31,21 @@ public class Meldanor extends ApoSkunkmanAI {
 
     @Override
     public void think(ApoSkunkmanAILevel level, ApoSkunkmanAIPlayer player) {
-        if (path == null)
-            findWay(level.getLevelAsByte(), player, level);
-        else if (!path.isEmpty())
+        if (path == null) {
+            findWay(player, level);
+            System.out.println("Way found!");
+        } else if (!path.isEmpty())
             moveTo(player, path.removeFirst());
         else
             throw new RuntimeException("Empty path but no goal :(");
 
     }
-    private void findWay(byte[][] LinkedList, ApoSkunkmanAIPlayer player, ApoSkunkmanAILevel level) {
+
+    private void findWay(ApoSkunkmanAIPlayer player, ApoSkunkmanAILevel level) {
+        AStar pathFinder = new AStar(level);
+        pathFinder.update(level, level.getGoalXPoint());
+        pathFinder.findWay(new Point((int) player.getX(), (int) player.getY()));
+        path = pathFinder.getPath();
     }
 
     private void moveTo(ApoSkunkmanAIPlayer player, Point p) {
