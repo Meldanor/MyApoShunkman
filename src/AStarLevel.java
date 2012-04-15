@@ -1,4 +1,6 @@
 import java.awt.Point;
+import java.util.LinkedList;
+import java.util.List;
 
 import apoSkunkman.ai.ApoSkunkmanAIConstants;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
@@ -23,7 +25,7 @@ public class AStarLevel {
 
     private Node[][] level;
 
-    public AStarLevel(ApoSkunkmanAILevel level, Point goal) {
+    public AStarLevel(ApoSkunkmanAILevel level) {
         byte[][] byteLevel = level.getLevelAsByte();
         this.level = new Node[byteLevel.length][byteLevel[0].length];
         createLevel();
@@ -39,7 +41,9 @@ public class AStarLevel {
     }
 
     // CALL THIS EVERY TICK TO UPDATE TO LEVEL AND PREPARE EVERYTHING FOR A*
-    public void update(ApoSkunkmanAILevel apoLevel, byte[][] byteLevel, Point goal) {
+    public void update(ApoSkunkmanAILevel apoLevel, Point goal) {
+
+        byte[][] byteLevel = apoLevel.getLevelAsByte();
 
         // Y-AXIS
         for (int y = 0; y < this.level.length; ++y) {
@@ -57,7 +61,23 @@ public class AStarLevel {
     }
 
     public Node getNode(int x, int y) {
-        return level[y][x];
+        if (y < level.length && y >= 0 && x < level[y].length && x >= 0)
+            return level[y][x];
+        else
+            return null;
+    }
+
+    public Node getNode(Point p) {
+        return getNode(p.x, p.y);
+    }
+
+    public List<Node> getNext(Point p) {
+        List<Node> list = new LinkedList<Node>();
+        list.add(getNode(p.x + 1, p.y));
+        list.add(getNode(p.x - 1, p.y));
+        list.add(getNode(p.x, p.y + 1));
+        list.add(getNode(p.x, p.y - 1));
+        return list;
     }
 
 }
