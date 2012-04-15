@@ -1,5 +1,7 @@
 import java.awt.Point;
 
+import apoSkunkman.ai.ApoSkunkmanAILevelGoodie;
+
 /*
  * Copyright (C) 2012 Kilian Gaertner
  * 
@@ -13,12 +15,12 @@ import java.awt.Point;
 @SuppressWarnings("serial")
 public class Node extends Point implements Comparable<Node> {
 
-    // STEPS ON THE PATH
-    private int G;
-    // HEURISTIC
-    private double H;
-
-    private double F;
+    // WAY TO GOAL
+    private double G = 0.0;
+    // ESTIMATED COSTS
+    private double H = 0.0;
+    // SUM OF G AND H
+    private double F = 0.0;
 
     private Node prev;
 
@@ -26,48 +28,55 @@ public class Node extends Point implements Comparable<Node> {
         super(x, y);
     }
 
-    public Node(int x, int y, int G, Point goal, byte[][] level) {
-        this(x, y);
-        this.G = G;
-        // CALCULATE HEURISTIC - DISTANCE * VALUE
-        H = goal.distance(x, y) * Costs.getCosts(level[y][x]);
-        F = G + H;
-    }
-
-    public int getG() {
+    public double getG() {
         return G;
     }
 
-    @Override
-    public int compareTo(Node o) {
-        // LOWER F IS BETTER
-        if (this.F < o.F)
-            return -1;
-        else if (this.F > o.F)
-            return +1;
-        // IF F IS THE SAME LOWER H IS BETTEr
-        else
-            return (int) (this.H - o.H);
+    public void updateG(double G) {
+        this.G = G;
+        calculateF();
+    }
 
+    public void updateNormalNode(Point goal, byte type) {
+        // CALCULATE HEURISTIC
+        // H = DISTANCE TO GOAL * WEIGHT OF LEVEL TYPE
+        this.H = goal.distance(x, y) * Costs.getCosts(type);
+        calculateF();
+    }
+
+    public void updateGoodieNode(Point goal, ApoSkunkmanAILevelGoodie goodie) {
+
+        // CALCULATE HEURISTIC
+        // H = DISTANCE TO GOAL * WEIGHT OF LEVEL TYPE
+        this.H = goal.distance(x, y) * GoodieCosts.getCosts(goodie.getGoodie());
+        calculateF();
+    }
+
+    private void calculateF() {
+        this.F = this.H + this.G;
     }
 
     public void setPrev(Node prev) {
         this.prev = prev;
+        updateG(prev.getG() + 1.0);
+    }
+
+    public Node getPrev() {
+        return prev;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Node))
-            return false;
-        if (obj == this)
-            return true;
-
-        return super.equals(obj);
+    public int compareTo(Node that) {
+        // THIS IS BETTER
+        if (this.F < that.F)
+            return -1;
+        // THAT IS BETTER
+        else if (this.F > that.F)
+            return 1;
+        // BOTH HAVE SAME F SO "H" IS IMPORTANT
+        else
+            return (int) (this.H - that.H);
 
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 }

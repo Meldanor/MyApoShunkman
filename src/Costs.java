@@ -17,8 +17,6 @@ public enum Costs {
     FREE        (ApoSkunkmanAIConstants.LEVEL_FREE,     20),
     STONE       (ApoSkunkmanAIConstants.LEVEL_STONE,    1000),
     BUSH        (ApoSkunkmanAIConstants.LEVEL_BUSH,     500),
-    GOODIE_GOOD (ApoSkunkmanAIConstants.LEVEL_GOODIE,   1),
-    GOODIE_BAD  (ApoSkunkmanAIConstants.LEVEL_GOODIE,   600),
     SKUNKMAN    (ApoSkunkmanAIConstants.LEVEL_SKUNKMAN, 2000);
     
     // @formatter:on

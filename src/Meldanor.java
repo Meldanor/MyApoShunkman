@@ -40,9 +40,6 @@ public class Meldanor extends ApoSkunkmanAI {
 
     }
     private void findWay(byte[][] LinkedList, ApoSkunkmanAIPlayer player, ApoSkunkmanAILevel level) {
-        AStar pathFinder = new AStar(LinkedList, new Point((int) player.getX(), (int) player.getY()), level.getGoalXPoint());
-        pathFinder.calculate();
-        path = pathFinder.getWay();
     }
 
     private void moveTo(ApoSkunkmanAIPlayer player, Point p) {
