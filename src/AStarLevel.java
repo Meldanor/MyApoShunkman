@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,8 +26,10 @@ public class AStarLevel {
 
     private Node[][] level;
 
+    private byte[][] byteLevel;
+
     public AStarLevel(ApoSkunkmanAILevel level) {
-        byte[][] byteLevel = level.getLevelAsByte();
+        byteLevel = level.getLevelAsByte();
         this.level = new Node[byteLevel.length][byteLevel[0].length];
         createLevel();
     }
@@ -43,7 +46,7 @@ public class AStarLevel {
     // CALL THIS EVERY TICK TO UPDATE TO LEVEL AND PREPARE EVERYTHING FOR A*
     public void update(ApoSkunkmanAILevel apoLevel, Point goal) {
 
-        byte[][] byteLevel = apoLevel.getLevelAsByte();
+        byteLevel = apoLevel.getLevelAsByte();
 
         // Y-AXIS
         for (int y = 0; y < this.level.length; ++y) {
@@ -77,7 +80,14 @@ public class AStarLevel {
         list.add(getNode(p.x - 1, p.y));
         list.add(getNode(p.x, p.y + 1));
         list.add(getNode(p.x, p.y - 1));
+
+        Iterator<Node> iter = list.iterator();
+        while (iter.hasNext()) {
+            Node node = iter.next();
+            if (node == null || byteLevel[node.y][node.x] == ApoSkunkmanAIConstants.LEVEL_STONE)
+                iter.remove();
+
+        }
         return list;
     }
-
 }
