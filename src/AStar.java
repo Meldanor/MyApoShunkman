@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -72,19 +73,20 @@ public class AStar {
                 } else {
                     // NODE IS NOT IN OPEN NOR CLOSED LIST - ADD IT
                     next.setPrev(current);
-                    openList.add(current);
+                    openList.add(next);
                 }
             }
         }
 
     }
 
-    public List<Node> getPath() {
+    public LinkedList<Node> getPath() {
         LinkedList<Node> list = new LinkedList<Node>();
-        list.add(closedList.get(0));
+        list.add(closedList.remove(0));
         for (Node node : closedList)
             list.addFirst(node.getPrev());
 
+        Collections.reverse(list);
         return list;
     }
 }
