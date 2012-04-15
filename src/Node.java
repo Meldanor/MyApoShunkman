@@ -40,7 +40,7 @@ public class Node extends Point implements Comparable<Node> {
     public void updateNormalNode(Point goal, byte type) {
         // CALCULATE HEURISTIC
         // H = DISTANCE TO GOAL * WEIGHT OF LEVEL TYPE
-        this.H = goal.distance(x, y) * Costs.getCosts(type);
+        this.H = goal.distance(x, y) * LevelCosts.getCosts(type);
         calculateF();
     }
 
