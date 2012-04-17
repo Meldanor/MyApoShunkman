@@ -23,7 +23,7 @@ public class AStar {
     private Point goal;
 
     private PriorityQueue<Node> openList = new PriorityQueue<Node>();
-    private List<Node> closedList = new LinkedList<Node>();
+    private LinkedList<Node> closedList = new LinkedList<Node>();
 
     public AStar(ApoSkunkmanAILevel apoLevel) {
         this.level = new AStarLevel(apoLevel);
@@ -82,9 +82,13 @@ public class AStar {
 
     public LinkedList<Node> getPath() {
         LinkedList<Node> list = new LinkedList<Node>();
-        list.add(closedList.remove(0));
-        for (Node node : closedList)
-            list.addFirst(node.getPrev());
+        Node node = closedList.removeLast();
+        list.add(node);
+
+        while (node.getPrev() != null) {
+            node = node.getPrev();
+            list.add(node);
+        }
 
         Collections.reverse(list);
         return list;
