@@ -1,7 +1,4 @@
 import java.awt.Point;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 import apoSkunkman.ai.ApoSkunkmanAIConstants;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
@@ -70,24 +67,26 @@ public class AStarLevel {
             return null;
     }
 
+    public Node checkNode(int x, int y) {
+        Node node = getNode(x, y);
+        if (node == null || byteLevel[node.y][node.x] == ApoSkunkmanAIConstants.LEVEL_STONE)
+            return null;
+        else
+            return node;
+    }
+
     public Node getNode(Point p) {
         return getNode(p.x, p.y);
     }
 
-    public List<Node> getNext(Point p) {
-        List<Node> list = new LinkedList<Node>();
-        list.add(getNode(p.x + 1, p.y));
-        list.add(getNode(p.x - 1, p.y));
-        list.add(getNode(p.x, p.y + 1));
-        list.add(getNode(p.x, p.y - 1));
-
-        Iterator<Node> iter = list.iterator();
-        while (iter.hasNext()) {
-            Node node = iter.next();
-            if (node == null || byteLevel[node.y][node.x] == ApoSkunkmanAIConstants.LEVEL_STONE)
-                iter.remove();
-
-        }
-        return list;
+    public Node[] getNext(Point p) {
+        // @formatter:off
+        return new Node[] {
+            checkNode(p.x + 1, p.y),
+            checkNode(p.x - 1, p.y),
+            checkNode(p.x, p.y + 1),
+            checkNode(p.x, p.y - 1)
+        };
+        // @formatter:on
     }
 }

@@ -1,8 +1,8 @@
 import java.awt.Point;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.PriorityQueue;
+import java.util.TreeSet;
 
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 
@@ -23,7 +23,7 @@ public class AStar {
     private Point goal;
 
     private PriorityQueue<Node> openList = new PriorityQueue<Node>();
-    private LinkedList<Node> closedList = new LinkedList<Node>();
+    private TreeSet<Node> closedList = new TreeSet<Node>();
 
     public AStar(ApoSkunkmanAILevel apoLevel) {
         this.level = new AStarLevel(apoLevel);
@@ -42,16 +42,17 @@ public class AStar {
         while (!openList.isEmpty()) {
 
             // REMOVE FIRST NODE
+            // O(1)
             current = openList.poll();
 
             closedList.add(current);
 
             // GOAL FOUND!
             if (current.equals(goal))
-                break;
+                return;
 
             // GET POSSIBLE NEXT NODES
-            List<Node> nextNodes = level.getNext(current);
+            Node[] nextNodes = level.getNext(current);
 
             // CHECK POSSIBILITIES
             for (Node next : nextNodes) {
@@ -59,30 +60,37 @@ public class AStar {
                 if (next == null)
                     continue;
                 // IGNORE NODES WHICH ARE IN CLOSED LIST
+                // O(1)
                 if (closedList.contains(next))
                     continue;
+                // O(N)
                 if (openList.contains(next)) {
                     // NEW PATH IS BETTER
                     if (next.getG() < current.getG()) {
                         // REMOVE AND ADD TO OPENLIST TO RESTORE SORT
+                        // O(N)
                         openList.remove(next);
                         // UPDATE PREV AND G
                         next.setPrev(current);
+                        // LOG(N)
                         openList.add(next);
                     }
                 } else {
                     // NODE IS NOT IN OPEN NOR CLOSED LIST - ADD IT
                     next.setPrev(current);
+                    // LOG(N)
                     openList.add(next);
                 }
             }
         }
 
+        // TODO: HAVE TO THINK WHAT TO DO!
+        throw new RuntimeException("Kein Weg gefunden!");
     }
 
     public LinkedList<Node> getPath() {
         LinkedList<Node> list = new LinkedList<Node>();
-        Node node = closedList.removeLast();
+        Node node = closedList.first();
         list.add(node);
 
         while (node.getPrev() != null) {

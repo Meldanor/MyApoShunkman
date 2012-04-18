@@ -76,7 +76,5 @@ public class Node extends Point implements Comparable<Node> {
         // BOTH HAVE SAME F SO "H" IS IMPORTANT
         else
             return (int) (this.H - that.H);
-
     }
-
 }
