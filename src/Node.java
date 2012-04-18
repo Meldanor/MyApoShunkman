@@ -24,8 +24,12 @@ public class Node extends Point implements Comparable<Node> {
 
     private Node prev;
 
+    private int hash = Integer.MIN_VALUE;
+
     public Node(int x, int y) {
         super(x, y);
+        // CALCULATE THE HASH BECAUSE IT CAN'T CHANGE
+        hash = super.hashCode();
     }
 
     public double getG() {
@@ -76,5 +80,16 @@ public class Node extends Point implements Comparable<Node> {
         // BOTH HAVE SAME F SO "H" IS IMPORTANT
         else
             return (int) (this.H - that.H);
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        // EQUALS WHEN X AND Y ARE THE SAME
+        return super.equals(obj);
     }
 }

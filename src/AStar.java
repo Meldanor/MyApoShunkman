@@ -60,7 +60,7 @@ public class AStar {
                 if (next == null)
                     continue;
                 // IGNORE NODES WHICH ARE IN CLOSED LIST
-                // O(1)
+                // O(LOG(N))
                 if (closedList.contains(next))
                     continue;
                 // O(N)
@@ -99,6 +99,7 @@ public class AStar {
         }
 
         Collections.reverse(list);
+        list.removeFirst();
         return list;
     }
 }
