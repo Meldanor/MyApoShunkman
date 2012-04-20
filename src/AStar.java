@@ -18,17 +18,22 @@ import apoSkunkman.ai.ApoSkunkmanAILevel;
 
 public class AStar {
 
+    // THE LEVEL NEVER CHANGE - JUST THE VALUES
     private AStarLevel level;
 
+    // THE CURRENT GOAL - CAN CHANGE
     private Point goal;
 
+    // OPENLIST AS BINARY HEAP QUEUE
     private PriorityQueue<Node> openList = new PriorityQueue<Node>();
+    // CLOSED LIST BASED OF AN HASH TREE
     private TreeSet<Node> closedList = new TreeSet<Node>();
 
     public AStar(ApoSkunkmanAILevel apoLevel) {
         this.level = new AStarLevel(apoLevel);
     }
 
+    // UPDATE THE LEVEL
     public void update(ApoSkunkmanAILevel apoLevel, Point goal) {
         this.level.update(apoLevel, goal);
         this.goal = goal;
@@ -36,7 +41,7 @@ public class AStar {
 
     public void findWay(Point start) {
         // GET START NODE
-        Node current = level.getNode(start);
+        Node current = level.getNode(start.x, start.y);
         // ADD IT TO OPEN LIST
         openList.add(current);
         while (!openList.isEmpty()) {
@@ -52,34 +57,34 @@ public class AStar {
                 return;
 
             // GET POSSIBLE NEXT NODES
-            Node[] nextNodes = level.getNext(current);
+            Node[] neighbors = level.getNeighbors(current);
 
             // CHECK POSSIBILITIES
-            for (Node next : nextNodes) {
+            for (Node neighbor : neighbors) {
                 // NODE IS OUTSIDE THE FIELD
-                if (next == null)
+                if (neighbor == null)
                     continue;
                 // IGNORE NODES WHICH ARE IN CLOSED LIST
                 // O(LOG(N))
-                if (closedList.contains(next))
+                if (closedList.contains(neighbor))
                     continue;
                 // O(N)
-                if (openList.contains(next)) {
+                if (openList.contains(neighbor)) {
                     // NEW PATH IS BETTER
-                    if (next.getG() < current.getG()) {
+                    if (neighbor.getG() < current.getG()) {
                         // REMOVE AND ADD TO OPENLIST TO RESTORE SORT
                         // O(N)
-                        openList.remove(next);
+                        openList.remove(neighbor);
                         // UPDATE PREV AND G
-                        next.setPrev(current);
+                        neighbor.setPrev(current);
                         // LOG(N)
-                        openList.add(next);
+                        openList.add(neighbor);
                     }
                 } else {
                     // NODE IS NOT IN OPEN NOR CLOSED LIST - ADD IT
-                    next.setPrev(current);
+                    neighbor.setPrev(current);
                     // LOG(N)
-                    openList.add(next);
+                    openList.add(neighbor);
                 }
             }
         }
@@ -88,17 +93,23 @@ public class AStar {
         throw new RuntimeException("Kein Weg gefunden!");
     }
 
+    // GENERATE THE FOUND PATH
     public LinkedList<Node> getPath() {
+        // THE PATH
         LinkedList<Node> list = new LinkedList<Node>();
+        // GET LAST ADDED NODE
         Node node = closedList.first();
         list.add(node);
 
+        // ITERATE BACKWARDS THROUGH THE NODES
         while (node.getPrev() != null) {
             node = node.getPrev();
             list.add(node);
         }
 
+        // REVERSE THE PATH
         Collections.reverse(list);
+        // REMOVE POINT OF PLAYER FIGURE, BECAUSE WE DON'T NEED TO GO THERE
         list.removeFirst();
         return list;
     }

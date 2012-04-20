@@ -22,9 +22,11 @@ public class Node extends Point implements Comparable<Node> {
     // SUM OF G AND H
     private double F = 0.0;
 
+    // THE PREVIOUS NODE - IMPORTANT TO CREATE THE PATH
     private Node prev;
 
-    private int hash = Integer.MIN_VALUE;
+    // CASHED HASH - NEVER CHANGE BECAUSE WE DON'T CHANGE X OR Y
+    private final int hash;
 
     public Node(int x, int y) {
         super(x, y);
@@ -32,15 +34,21 @@ public class Node extends Point implements Comparable<Node> {
         hash = super.hashCode();
     }
 
+    /**
+     * @return Return the path length to this node
+     */
     public double getG() {
         return G;
     }
 
-    public void updateG(double G) {
-        this.G = G;
-        calculateF();
-    }
-
+    /**
+     * Calculate the values for a normal non goodie node and recalculate F
+     * 
+     * @param goal
+     *            The goal from the path finder
+     * @param type
+     *            The type of the level tile
+     */
     public void updateNormalNode(Point goal, byte type) {
         // CALCULATE HEURISTIC
         // H = DISTANCE TO GOAL * WEIGHT OF LEVEL TYPE
@@ -48,6 +56,14 @@ public class Node extends Point implements Comparable<Node> {
         calculateF();
     }
 
+    /**
+     * Calculate the values for a goodie node and recalculate F
+     * 
+     * @param goal
+     *            The goal from the path finder
+     * @param goodie
+     *            The goodie on the level tile
+     */
     public void updateGoodieNode(Point goal, ApoSkunkmanAILevelGoodie goodie) {
 
         // CALCULATE HEURISTIC
@@ -56,19 +72,49 @@ public class Node extends Point implements Comparable<Node> {
         calculateF();
     }
 
+    /**
+     * <code>
+     * F =G + H <br>
+     * COST = COSTS FOR THE WAY + HEURISTIC COSTS OF THE NODE</code>
+     */
     private void calculateF() {
         this.F = this.H + this.G;
     }
 
+    /**
+     * Update the previous node of the node and recalculate G and F
+     * 
+     * @param prev
+     */
     public void setPrev(Node prev) {
         this.prev = prev;
         updateG(prev.getG() + 1.0);
     }
 
+    /**
+     * Update the path lengh to this node and recalculate F
+     * 
+     * @param G
+     *            The new path length
+     */
+    private void updateG(double G) {
+        this.G = G;
+        calculateF();
+    }
+
+    /**
+     * @return The previous node of this node
+     */
     public Node getPrev() {
         return prev;
     }
 
+    /**
+     * This node is less than that node when this has a lower F or if equals are
+     * lower H
+     * 
+     * @param that
+     */
     @Override
     public int compareTo(Node that) {
         // THIS IS BETTER

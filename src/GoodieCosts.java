@@ -13,21 +13,30 @@ import apoSkunkman.ai.ApoSkunkmanAIConstants;
 public enum GoodieCosts {
 
     //@formatter:off
-    // LOWER COSTS THAN FREE WAY
+    // GOOD GODIES HAVE A LOWER COSTS TO PREFAR THEM AT PATHFINDING
+    
+    /** Goodie to increase player speed. Costs = 10 */
     GOOD_FAST       (ApoSkunkmanAIConstants.GOODIE_GOOD_FAST,       10),
-    GOOD_SKUN       (ApoSkunkmanAIConstants.GOODIE_GOOD_SKUNKMAN,   10),
-    // LOWER THAN ALL -> INCREASE ALL VALUES
-    GOOD_GOD        (ApoSkunkmanAIConstants.GOODIE_GOOD_GOD,        3),
+    /** Goodie to increase bomb slots. Costs = 10 */
+    GOOD_BOMB       (ApoSkunkmanAIConstants.GOODIE_GOOD_SKUNKMAN,   10),
+    /** Goodie to increase bomb range. Costs = 10 */
     GOOD_WIDTH      (ApoSkunkmanAIConstants.GOODIE_GOOD_WIDTH,      10),
+    /** Goodie to increase all values by one. Costs = 3 */
+    GOOD_GOD        (ApoSkunkmanAIConstants.GOODIE_GOOD_GOD,        3),
 
+    /** Goodie to decrease player speed. Costs = 400 */
     BAD_FAST        (ApoSkunkmanAIConstants.GOODIE_BAD_FAST,        400),
-    BAD_SKUN        (ApoSkunkmanAIConstants.GOODIE_BAD_SKUNKMAN,    400),
-    BAD_GOD         (ApoSkunkmanAIConstants.GOODIE_BAD_GOD,         800),
-    BAD_WIDTH       (ApoSkunkmanAIConstants.GOODIE_BAD_WIDTH,       400);
-
+    /** Goodie to decrease bomb slots. Costs = 400 */
+    BAD_BOMB        (ApoSkunkmanAIConstants.GOODIE_BAD_SKUNKMAN,    400),
+    /** Goodie to decrease bomb range. Costs = 400 */
+    BAD_WIDTH       (ApoSkunkmanAIConstants.GOODIE_BAD_WIDTH,       400),
+    /** Goodie to decrease all values by one. Costs = 800 */
+    BAD_GOD         (ApoSkunkmanAIConstants.GOODIE_BAD_GOD,         800);
     //@formatter:on    
 
+    // THE TYPE OF THE GOODIE
     private final int type;
+    // THE HEURISTIC COSTS OF THE GOODIE
     private final int costs;
 
     private GoodieCosts(final int goodieType, final int costs) {
@@ -39,6 +48,12 @@ public enum GoodieCosts {
         return costs;
     }
 
+    /**
+     * 
+     * @param type
+     *            The type of the goodie. See {@link ApoSkunkmanAIConstants}
+     * @return The heuristic costs of the goodie
+     */
     public static int getCosts(int type) {
         for (GoodieCosts gCosts : values())
             if (gCosts.type == type)

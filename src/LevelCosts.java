@@ -13,15 +13,19 @@ import apoSkunkman.ai.ApoSkunkmanAIConstants;
 public enum LevelCosts {
 
     // @formatter:off
-
+    // WALKABLE FIELD
+    /** A walkable tile. Costs = 20 */
     FREE        (ApoSkunkmanAIConstants.LEVEL_FREE,     20),
-    STONE       (ApoSkunkmanAIConstants.LEVEL_STONE,    1000),
+    /** A bombable bush tile. Costs = 500 */
     BUSH        (ApoSkunkmanAIConstants.LEVEL_BUSH,     500),
-    SKUNKMAN    (ApoSkunkmanAIConstants.LEVEL_SKUNKMAN, 2000);
+    /** A bomb on the tile. Costs = 2000 */
+    BOMB        (ApoSkunkmanAIConstants.LEVEL_SKUNKMAN, 2000);
     
     // @formatter:on
 
+    // THE TYPE OF THE GOODIE
     private final byte type;
+    // THE HEURISTIC COSTS OF THE GOODIE
     private final int costs;
 
     private LevelCosts(byte type, int costs) {
@@ -29,6 +33,12 @@ public enum LevelCosts {
         this.costs = costs;
     }
 
+    /**
+     * 
+     * @param type
+     *            The type of the tile. See {@link ApoSkunkmanAIConstants}
+     * @return The heuristic costs of the tile
+     */
     public static int getCosts(byte type) {
         for (LevelCosts cost : values())
             if (cost.type == type)
