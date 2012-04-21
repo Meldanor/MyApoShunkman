@@ -89,12 +89,14 @@ public class AStar {
             }
         }
 
-        // TODO: HAVE TO THINK WHAT TO DO!
-        throw new RuntimeException("Kein Weg gefunden!");
+        // NO WAY FOUND
+        closedList = null;
     }
 
     // GENERATE THE FOUND PATH
     public LinkedList<Node> getPath() {
+        if (closedList == null)
+            return null;
         // THE PATH
         LinkedList<Node> list = new LinkedList<Node>();
         // GET LAST ADDED NODE
