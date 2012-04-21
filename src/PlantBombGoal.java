@@ -33,9 +33,11 @@ public class PlantBombGoal extends WalkGoal {
             moveNext(player);
         // CAN PLANT THE BOMB
         else if (player.getCurSkunkmanLay() < player.getMaxSkunkman()) {
+            // TODO: CHECK WHETHER THE PLAYER CAN TAKE COVER FROM ITS OWN BOMB
+            // OR NOT!
             player.laySkunkman();
             bombPlanted = true;
-        } 
+        }
         // HAVE TO WAIT TO PLANT THE BOMB
         else
             return;
