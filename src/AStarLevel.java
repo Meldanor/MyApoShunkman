@@ -22,23 +22,25 @@ import apoSkunkman.ai.ApoSkunkmanAILevel;
 public class AStarLevel {
 
     // A LEVEL BASED OF THE BYTELEVEL VALUES
-    private Node[][] level;
+    private static Node[][] level;
 
     // LEVEL FROM APOSKUNKMAN
     private byte[][] byteLevel;
 
-    public AStarLevel(ApoSkunkmanAILevel level) {
-        byteLevel = level.getLevelAsByte();
-        this.level = new Node[byteLevel.length][byteLevel[0].length];
-        createLevel();
+    public AStarLevel(ApoSkunkmanAILevel apoLevel) {
+        byteLevel = apoLevel.getLevelAsByte();
+        if (level == null) {
+            level = new Node[byteLevel.length][byteLevel[0].length];
+            createLevel();
+        }
     }
 
     // GENERATE THE NODES WITHOUT ANY WEIGHTS
     private void createLevel() {
         // Y-AXIS
-        for (int y = 0; y < this.level.length; ++y)
+        for (int y = 0; y < level.length; ++y)
             // X-AXIS
-            for (int x = 0; x < this.level[y].length; ++x) {
+            for (int x = 0; x < level[y].length; ++x) {
                 // IGNORE NOT WALKABLE NODES
                 if (byteLevel[y][x] != ApoSkunkmanAIConstants.LEVEL_STONE)
                     level[y][x] = new Node(x, y);
@@ -51,9 +53,9 @@ public class AStarLevel {
         byteLevel = apoLevel.getLevelAsByte();
 
         // Y-AXIS
-        for (int y = 0; y < this.level.length; ++y) {
+        for (int y = 0; y < level.length; ++y) {
             // X-AXIS
-            for (int x = 0; x < this.level[y].length; ++x) {
+            for (int x = 0; x < level[y].length; ++x) {
                 Node node = getNode(x, y);
                 if (node != null) {
                     node = updateNode(node, goal, apoLevel, byteLevel[y][x]);
