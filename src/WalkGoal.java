@@ -16,11 +16,15 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class WalkGoal extends Goal {
 
-    protected final Point goal;
+    protected Point goal;
 
-    protected final ApoSkunkmanAIPlayer player;
+    protected ApoSkunkmanAIPlayer player;
 
     protected LinkedList<Node> path = null;
+
+    protected WalkGoal() {
+
+    }
 
     public WalkGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final ApoSkunkmanAIPlayer player) {
         this.goal = goal;
@@ -28,7 +32,7 @@ public class WalkGoal extends Goal {
         calculateGoal(goal, apoLevel, player);
     }
 
-    private void calculateGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final ApoSkunkmanAIPlayer player) {
+    protected void calculateGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final ApoSkunkmanAIPlayer player) {
         AStar pathFinder = new AStar(apoLevel);
         pathFinder.update(apoLevel, goal);
         pathFinder.findWay(new Point((int) player.getX(), (int) player.getY()));
