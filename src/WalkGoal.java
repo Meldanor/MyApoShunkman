@@ -16,11 +16,11 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class WalkGoal extends Goal {
 
-    private final Point goal;
+    protected final Point goal;
 
-    private final ApoSkunkmanAIPlayer player;
+    protected final ApoSkunkmanAIPlayer player;
 
-    private LinkedList<Node> path = null;
+    protected LinkedList<Node> path = null;
 
     public WalkGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final ApoSkunkmanAIPlayer player) {
         this.goal = goal;
@@ -47,10 +47,11 @@ public class WalkGoal extends Goal {
     @Override
     public void process() {
         // GO TO NEXT POINT
-        moveTo(player, path.removeFirst());
+        moveNext(player);
     }
 
-    private void moveTo(ApoSkunkmanAIPlayer player, Point p) {
+    protected void moveNext(ApoSkunkmanAIPlayer player) {
+        Point p = path.removeFirst();
 
         // CALCULATE DIRECTION
         int diff = p.x - (int) player.getX();
