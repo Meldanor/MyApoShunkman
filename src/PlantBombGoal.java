@@ -37,7 +37,7 @@ public class PlantBombGoal extends WalkGoal {
     public void process() {
         // GO TO BOMB SPOT
         if (!path.isEmpty())
-            player.moveTo(path.removeFirst());
+            player.moveTo(path);
         // CAN PLANT THE BOMB
         else if (player.apoPlayer.getCurSkunkmanLay() < player.apoPlayer.getMaxSkunkman()) {
             // TODO: CHECK WHETHER THE PLAYER CAN TAKE COVER FROM ITS OWN BOMB

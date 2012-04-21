@@ -1,5 +1,7 @@
 import java.awt.Point;
+import java.util.LinkedList;
 
+import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 /*
@@ -26,6 +28,10 @@ public class MeldanorPlayer {
         this.apoPlayer = apoPlayer;
     }
 
+    public void moveTo(LinkedList<Node> path) {
+        moveTo(path.removeFirst());
+    }
+
     public void moveTo(Point p) {
 
         // CALCULATE DIRECTION
@@ -44,6 +50,17 @@ public class MeldanorPlayer {
             else if (diff < 0)
                 apoPlayer.movePlayerUp();
         }
+    }
+
+    public LinkedList<Node> findWay(final Point goal, final ApoSkunkmanAILevel apoLevel) {
+        AStar pathFinder = new AStar(apoLevel);
+        pathFinder.update(apoLevel, goal);
+        pathFinder.findWay(new Point((int) apoPlayer.getX(), (int) apoPlayer.getY()));
+        return pathFinder.getPath();
+    }
+
+    public Point getPosition() {
+        return new Point((int) apoPlayer.getX(), (int) apoPlayer.getY());
     }
 
 }

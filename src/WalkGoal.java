@@ -22,16 +22,12 @@ public class WalkGoal extends Goal {
     protected LinkedList<Node> path = null;
 
     public WalkGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
-        this.goal = goal;
         this.player = player;
-        calculateGoal(goal, apoLevel, player);
-    }
-
-    protected void calculateGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
-        AStar pathFinder = new AStar(apoLevel);
-        pathFinder.update(apoLevel, goal);
-        pathFinder.findWay(new Point((int) player.apoPlayer.getX(), (int) player.apoPlayer.getY()));
-        path = pathFinder.getPath();
+        this.goal = goal;
+        path = player.findWay(goal, apoLevel);
+        // NO WAY FOUND
+        if (path == null)
+            setCancelled();
     }
 
     @Override
@@ -40,13 +36,13 @@ public class WalkGoal extends Goal {
         // OR
         // PATH IS INVALID OR EMPTY
         // (PRAY TO THE MACHINE GOD THAT THIS WILL NOT HAPPEN)
-        return player.apoPlayer.getX() == goal.x && player.apoPlayer.getY() == goal.y || path == null || path.isEmpty();
+        return player.getPosition().equals(goal) || path == null || path.isEmpty();
     }
 
     @Override
     public void process() {
         // GO TO NEXT POINT
-        player.moveTo(path.removeFirst());
+        player.moveTo(path);
     }
 
     @Override
