@@ -8,7 +8,7 @@
  * begegnen.
  */
 
-public abstract class Goal {
+public abstract class Goal implements Comparable<Goal> {
 
     private boolean isCancelled = false;
 
@@ -38,4 +38,11 @@ public abstract class Goal {
      */
     public abstract GoalPriority getPriority();
 
+    @Override
+    /**
+     * The priority is important
+     */
+    public int compareTo(Goal that) {
+        return this.getPriority().compareTo(that.getPriority());
+    }
 }
