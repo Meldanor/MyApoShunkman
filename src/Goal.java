@@ -45,4 +45,17 @@ public abstract class Goal implements Comparable<Goal> {
     public int compareTo(Goal that) {
         return this.getPriority().compareTo(that.getPriority());
     }
+
+    public enum GoalPriority {
+        // @formatter:off
+        /** Walking to something*/
+        LOW,
+        /** Normal like waiting for a bomb exploding*/
+        NORMAL,
+        /** Important like getting a goodie*/
+        HIGH,
+        /** Higher than everything. Only one goal with this should exist once*/
+        CRITICAL;
+        // @formatter:on
+    }
 }
