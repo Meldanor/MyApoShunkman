@@ -1,7 +1,6 @@
 import java.awt.Point;
 
 import apoSkunkman.ai.ApoSkunkmanAILevel;
-import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 /*
  * Copyright (C) 2012 Kilian Gaertner
@@ -13,11 +12,19 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  * begegnen.
  */
 
+/**
+ * Goal to plant a bomb at a certain position. This goal shall throw a
+ * TakeCoverGoal but doesn't search for cover
+ * 
+ * @author Meldanor
+ * 
+ */
 public class PlantBombGoal extends WalkGoal {
 
+    /** Is the bomb planted? */
     private boolean bombPlanted;
 
-    public PlantBombGoal(Point bombSpot, ApoSkunkmanAILevel apoLevel, ApoSkunkmanAIPlayer player) {
+    public PlantBombGoal(final Point bombSpot, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
         super(bombSpot, apoLevel, player);
     }
 
@@ -30,12 +37,12 @@ public class PlantBombGoal extends WalkGoal {
     public void process() {
         // GO TO BOMB SPOT
         if (!path.isEmpty())
-            moveNext(player);
+            player.moveTo(path.removeFirst());
         // CAN PLANT THE BOMB
-        else if (player.getCurSkunkmanLay() < player.getMaxSkunkman()) {
+        else if (player.apoPlayer.getCurSkunkmanLay() < player.apoPlayer.getMaxSkunkman()) {
             // TODO: CHECK WHETHER THE PLAYER CAN TAKE COVER FROM ITS OWN BOMB
             // OR NOT!
-            player.laySkunkman();
+            player.apoPlayer.laySkunkman();
             bombPlanted = true;
         }
         // HAVE TO WAIT TO PLANT THE BOMB

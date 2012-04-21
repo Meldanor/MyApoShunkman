@@ -2,7 +2,6 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 import apoSkunkman.ai.ApoSkunkmanAILevel;
-import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 /*
  * Copyright (C) 2012 Kilian Gaertner
@@ -18,24 +17,20 @@ public class WalkGoal extends Goal {
 
     protected Point goal;
 
-    protected ApoSkunkmanAIPlayer player;
+    protected MeldanorPlayer player;
 
     protected LinkedList<Node> path = null;
 
-    protected WalkGoal() {
-
-    }
-
-    public WalkGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final ApoSkunkmanAIPlayer player) {
+    public WalkGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
         this.goal = goal;
         this.player = player;
         calculateGoal(goal, apoLevel, player);
     }
 
-    protected void calculateGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final ApoSkunkmanAIPlayer player) {
+    protected void calculateGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
         AStar pathFinder = new AStar(apoLevel);
         pathFinder.update(apoLevel, goal);
-        pathFinder.findWay(new Point((int) player.getX(), (int) player.getY()));
+        pathFinder.findWay(new Point((int) player.apoPlayer.getX(), (int) player.apoPlayer.getY()));
         path = pathFinder.getPath();
     }
 
@@ -45,34 +40,13 @@ public class WalkGoal extends Goal {
         // OR
         // PATH IS INVALID OR EMPTY
         // (PRAY TO THE MACHINE GOD THAT THIS WILL NOT HAPPEN)
-        return player.getX() == goal.x && player.getY() == goal.y || path == null || path.isEmpty();
+        return player.apoPlayer.getX() == goal.x && player.apoPlayer.getY() == goal.y || path == null || path.isEmpty();
     }
 
     @Override
     public void process() {
         // GO TO NEXT POINT
-        moveNext(player);
-    }
-
-    protected void moveNext(ApoSkunkmanAIPlayer player) {
-        Point p = path.removeFirst();
-
-        // CALCULATE DIRECTION
-        int diff = p.x - (int) player.getX();
-
-        // CHECK X-AXIS
-        if (diff > 0)
-            player.movePlayerRight();
-        else if (diff < 0)
-            player.movePlayerLeft();
-        else {
-            // CHECK Y-AXIS
-            diff = p.y - (int) player.getY();
-            if (diff > 0)
-                player.movePlayerDown();
-            else if (diff < 0)
-                player.movePlayerUp();
-        }
+        player.moveTo(path.removeFirst());
     }
 
     @Override
