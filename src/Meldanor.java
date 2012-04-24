@@ -14,6 +14,8 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class Meldanor extends ApoSkunkmanAI {
 
+    private KIManager kiManager;
+
     @Override
     public String getPlayerName() {
         return getClass().getSimpleName();
@@ -26,7 +28,10 @@ public class Meldanor extends ApoSkunkmanAI {
 
     @Override
     public void think(ApoSkunkmanAILevel level, ApoSkunkmanAIPlayer player) {
-
+        if (kiManager == null)
+            kiManager = new KIManager(player, level);
+        else
+            kiManager.tick();
     }
 
 }
