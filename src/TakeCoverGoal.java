@@ -39,6 +39,8 @@ public class TakeCoverGoal extends Goal {
 
     @Override
     public void process() {
+        if (isCancelled())
+            return;
         player.moveTo(path);
 
     }
@@ -50,19 +52,12 @@ public class TakeCoverGoal extends Goal {
     // SEARCHING FOR COVER AND CALCULATE A PATH TO IT
     private void findCover(ApoSkunkmanAILevel apoLevel, ApoSkunkmanAILevelSkunkman bomb) {
         Point start = player.getPosition();
-        Point pBomb = new Point((int) bomb.getX(), (int) bomb.getY());
+//        Point pBomb = new Point((int) bomb.getX(), (int) bomb.getY());
         int radius = bomb.getSkunkWidth() + 1;
         byte[][] byteLevel = apoLevel.getLevelAsByte();
 
         // CHECK POSSIBILITES
-        // @formatter:off
-        Point[] possi = {
-                getPoint(start.x + radius,  start.y,            byteLevel),
-                getPoint(start.x - radius,  start.y,            byteLevel),
-                getPoint(start.x ,          start.y + radius,   byteLevel),
-                getPoint(start.x ,          start.y - radius,   byteLevel),
-        };
-        // @formatter:on
+        Point[] possi = getDirectCover(start, radius, byteLevel);
 
         List<LinkedList<Node>> paths = new ArrayList<LinkedList<Node>>(4);
         for (Point pos : possi) {
@@ -92,6 +87,7 @@ public class TakeCoverGoal extends Goal {
         }
 
     }
+
     private Point getPoint(int x, int y, byte[][] byteLevel) {
         // IS INSIDE THE FIELD AND NOT A STONE
         if (y < byteLevel.length && y >= 0 && x < byteLevel[y].length && x >= 0 && byteLevel[y][x] != ApoSkunkmanAIConstants.LEVEL_STONE && byteLevel[y][x] != ApoSkunkmanAIConstants.LEVEL_BUSH)
@@ -100,16 +96,15 @@ public class TakeCoverGoal extends Goal {
         else
             return null;
     }
-//
-//    private List<Point> getNeighbors(Point p, ApoSkunkmanAILevel apoLevel) {
-//        byte[][] byteLevel = apoLevel.getLevelAsByte();
-//        List<Point> neighbors = new LinkedList<Point>();
-//
-//        // CHECK POINTS IN ROW OUTSIDE THE BOMB RADIUS
-//        // @formatter:off
-//        int bombRadius = 
-//        // @formatter:on
-//        return neighbors;
-//
-//    }
+
+    private Point[] getDirectCover(Point start, int radius, byte[][] byteLevel) {
+        // @formatter:off
+        return new Point[] {
+                getPoint(start.x + radius,  start.y,            byteLevel),
+                getPoint(start.x - radius,  start.y,            byteLevel),
+                getPoint(start.x ,          start.y + radius,   byteLevel),
+                getPoint(start.x ,          start.y - radius,   byteLevel),
+        };
+        // @formatter:on
+    }
 }
