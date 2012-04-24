@@ -24,6 +24,10 @@ public class PlantBombGoal extends WalkGoal {
     /** Is the bomb planted? */
     private boolean bombPlanted = false;
 
+    public PlantBombGoal(final Point bombSpot, final MeldanorPlayer player) {
+        super(bombSpot, player);
+    }
+
     public PlantBombGoal(final Point bombSpot, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
         super(bombSpot, apoLevel, player);
     }

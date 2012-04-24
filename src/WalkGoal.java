@@ -21,9 +21,13 @@ public class WalkGoal extends Goal {
 
     protected LinkedList<Node> path = null;
 
-    public WalkGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
+    public WalkGoal(final Point goal, final MeldanorPlayer player) {
         this.player = player;
         this.goal = goal;
+    }
+
+    public WalkGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
+        this(goal, player);
         path = player.findWay(goal, apoLevel);
         // NO WAY FOUND
         if (path == null)
@@ -41,6 +45,8 @@ public class WalkGoal extends Goal {
 
     @Override
     public void process() {
+        if (isCancelled())
+            return;
         // GO TO NEXT POINT
         player.moveTo(path);
     }
@@ -48,6 +54,12 @@ public class WalkGoal extends Goal {
     @Override
     public GoalPriority getPriority() {
         return GoalPriority.LOW;
+    }
+
+    public void calculateWay(ApoSkunkmanAILevel apoLevel) {
+        path = player.findWay(goal, apoLevel);
+        if (path == null)
+            setCancelled();
     }
 
 }
