@@ -22,17 +22,15 @@ import apoSkunkman.ai.ApoSkunkmanAILevel;
 public class AStarLevel {
 
     // A LEVEL BASED OF THE BYTELEVEL VALUES
-    private static Node[][] level;
+    private Node[][] level;
 
     // LEVEL FROM APOSKUNKMAN
     private byte[][] byteLevel;
 
     public AStarLevel(ApoSkunkmanAILevel apoLevel) {
         byteLevel = apoLevel.getLevelAsByte();
-        if (level == null) {
-            level = new Node[byteLevel.length][byteLevel[0].length];
-            createLevel();
-        }
+        level = new Node[byteLevel.length][byteLevel[0].length];
+        createLevel();
     }
 
     // GENERATE THE NODES WITHOUT ANY WEIGHTS
