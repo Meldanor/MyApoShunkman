@@ -27,11 +27,13 @@ public class Meldanor extends ApoSkunkmanAI {
     }
 
     @Override
+    public void load(String path) {
+        kiManager = new KIManager();
+    }
+
+    @Override
     public void think(ApoSkunkmanAILevel level, ApoSkunkmanAIPlayer player) {
-        if (kiManager == null)
-            kiManager = new KIManager(player, level);
-        else
-            kiManager.tick(level, player);
+        kiManager.tick(level, player);
     }
 
 }

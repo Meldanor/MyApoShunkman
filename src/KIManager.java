@@ -19,6 +19,9 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class KIManager {
 
+    // KI MANAGER HAS ALL NECESSARY VALUES?
+    boolean isInitialized = false;
+
     // WRAPPER FOR APO PLAYER CLASS
     private MeldanorPlayer player;
 
@@ -35,13 +38,8 @@ public class KIManager {
     // GOALS FOR THE GOAL TYPE LEVEL
     private Queue<Goal> goalsForWalkLevel = new LinkedList<Goal>();
 
-    public KIManager(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
-        player = new MeldanorPlayer(apoPlayer);
-        this.apoLevel = apoLevel;
-        levelType = apoLevel.getType();
-        if (levelType == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X) {
-            handleGoalLevel();
-        }
+    public KIManager() {
+        // EMPTY CONSTRUCTOR
     }
 
     private void handleGoalLevel() {
@@ -156,8 +154,20 @@ public class KIManager {
 
     // UPDATING VALUES
     private void update(ApoSkunkmanAILevel apoLevel, ApoSkunkmanAIPlayer apoPlayer) {
-        this.apoLevel = apoLevel;
-        this.player.update(apoPlayer);
+
+        if (isInitialized) {
+            this.apoLevel = apoLevel;
+            this.player.update(apoPlayer);
+        } else {
+            player = new MeldanorPlayer(apoPlayer);
+            this.apoLevel = apoLevel;
+            levelType = apoLevel.getType();
+            if (levelType == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X) {
+                handleGoalLevel();
+
+            }
+            isInitialized = true;
+        }
     }
 
 }
