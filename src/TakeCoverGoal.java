@@ -23,7 +23,7 @@ public class TakeCoverGoal extends Goal {
 
     private final MeldanorPlayer player;
 
-    private Point cover;
+//    private Point cover;
 
     private LinkedList<Node> path;
 
@@ -65,8 +65,8 @@ public class TakeCoverGoal extends Goal {
 
         List<LinkedList<Node>> paths = new ArrayList<LinkedList<Node>>(4);
         for (Point pos : possi) {
-            if (pos == null) {
-                path = player.findWay(cover, apoLevel);
+            if (pos != null) {
+                path = player.findWay(pos, apoLevel);
                 if (path != null) {
                     paths.add(path);
                     path = null;

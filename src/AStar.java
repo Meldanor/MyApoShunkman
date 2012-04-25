@@ -35,8 +35,8 @@ public class AStar {
 
     // UPDATE THE LEVEL
     public void update(ApoSkunkmanAILevel apoLevel, Point goal) {
-        this.level.update(apoLevel, goal);
         this.goal = goal;
+        this.level.update(apoLevel, goal);
     }
 
     public void findWay(Point start) {

@@ -25,7 +25,7 @@ public class MeldanorPlayer {
     public ApoSkunkmanAIPlayer apoPlayer;
 
     public MeldanorPlayer(ApoSkunkmanAIPlayer apoPlayer) {
-        this.apoPlayer = apoPlayer;
+        this.update(apoPlayer);
     }
 
     public void moveTo(LinkedList<Node> path) {
@@ -61,6 +61,10 @@ public class MeldanorPlayer {
 
     public Point getPosition() {
         return new Point((int) apoPlayer.getX(), (int) apoPlayer.getY());
+    }
+
+    public void update(ApoSkunkmanAIPlayer apoPlayer) {
+        this.apoPlayer = apoPlayer;
     }
 
 }

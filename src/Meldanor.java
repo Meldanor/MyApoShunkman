@@ -31,7 +31,7 @@ public class Meldanor extends ApoSkunkmanAI {
         if (kiManager == null)
             kiManager = new KIManager(player, level);
         else
-            kiManager.tick();
+            kiManager.tick(level, player);
     }
 
 }

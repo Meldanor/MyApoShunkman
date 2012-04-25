@@ -19,14 +19,20 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class KIManager {
 
+    // WRAPPER FOR APO PLAYER CLASS
     private MeldanorPlayer player;
+
     private ApoSkunkmanAILevel apoLevel;
 
     private int levelType;
 
+    // CURRENT GOAL TO ACHIEVE
     private Goal currentGoal;
+
+    // GOAL TO TAKE COVER (AFTER BOMB HAS BEEN FOUND)
     private Goal coverGoal;
 
+    // GOALS FOR THE GOAL TYPE LEVEL
     private Queue<Goal> goalsForWalkLevel = new LinkedList<Goal>();
 
     public KIManager(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
@@ -111,7 +117,10 @@ public class KIManager {
 
     }
 
-    public void tick() {
+    public void tick(ApoSkunkmanAILevel apoLevel, ApoSkunkmanAIPlayer apoPlayer) {
+
+        // UPDATE VALUES
+        this.update(apoLevel, apoPlayer);
 
         // CHECK IF BOMB CAN KILL PLAYER
         this.lookForBombs();
@@ -143,6 +152,12 @@ public class KIManager {
 
         }
         currentGoal.process();
+    }
+
+    // UPDATING VALUES
+    private void update(ApoSkunkmanAILevel apoLevel, ApoSkunkmanAIPlayer apoPlayer) {
+        this.apoLevel = apoLevel;
+        this.player.update(apoPlayer);
     }
 
 }
