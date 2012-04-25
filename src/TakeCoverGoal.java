@@ -27,14 +27,18 @@ public class TakeCoverGoal extends Goal {
 
     private LinkedList<Node> path;
 
+    private ApoSkunkmanAILevelSkunkman bomb;
+
     public TakeCoverGoal(MeldanorPlayer player, ApoSkunkmanAILevel apoLevel, ApoSkunkmanAILevelSkunkman bomb) {
         this.player = player;
-        findCover(apoLevel, bomb);
+        this.bomb = bomb;
+        findCover(apoLevel);
     }
 
     @Override
     public boolean isFinished() {
-        return player.getPosition().equals(cover);
+        // PLAYER HAS TAKEN COVER OR BOMB HAS EXPLODED
+        return bomb.getTimeToExplosion() <= 0;
     }
 
     @Override
@@ -50,7 +54,7 @@ public class TakeCoverGoal extends Goal {
     }
 
     // SEARCHING FOR COVER AND CALCULATE A PATH TO IT
-    private void findCover(ApoSkunkmanAILevel apoLevel, ApoSkunkmanAILevelSkunkman bomb) {
+    private void findCover(ApoSkunkmanAILevel apoLevel) {
         Point start = player.getPosition();
 //        Point pBomb = new Point((int) bomb.getX(), (int) bomb.getY());
         int radius = bomb.getSkunkWidth() + 1;

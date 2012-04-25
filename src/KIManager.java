@@ -4,6 +4,7 @@ import java.util.Queue;
 
 import apoSkunkman.ai.ApoSkunkmanAIConstants;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
+import apoSkunkman.ai.ApoSkunkmanAILevelSkunkman;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 /*
@@ -24,6 +25,7 @@ public class KIManager {
     private int levelType;
 
     private Goal currentGoal;
+    private Goal coverGoal;
 
     private Queue<Goal> goalsForWalkLevel = new LinkedList<Goal>();
 
@@ -63,7 +65,71 @@ public class KIManager {
         ((WalkGoal) currentGoal).calculateWay(apoLevel);
     }
 
+    // CHECK CURRENT LEVEL FOR BOMBS
+    private void lookForBombs() {
+
+        byte[][] byteLevel = apoLevel.getLevelAsByte();
+
+        ApoSkunkmanAILevelSkunkman bomb = null;
+        Queue<Goal> bombs = new LinkedList<Goal>();
+
+        // ITERATE OVER ALL POINTS
+        for (int y = 0; y < byteLevel.length; ++y) {
+            for (int x = 0; x < byteLevel[y].length; ++x) {
+                // THERE IS A BOMB
+                if (byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_SKUNKMAN) {
+                    bomb = apoLevel.getSkunkman(y, x);
+                    System.out.println("Bomb found at " + x + ";" + y);
+                    // BOMB CAN HIT PLAYER -> SEARCH AND TAKE COVER
+                    if (bombHitPlayer(bomb)) {
+                        bombs.add(new TakeCoverGoal(player, apoLevel, bomb));
+
+                        System.out.println("Bomb trifft");
+                    }
+                }
+            }
+        }
+
+        // LOOK FOR THE MOST RELEVANT GOAL
+        if (bombs.size() > 1) {
+            // TODO: Implement this
+        } else if (bombs.size() == 1) {
+            this.coverGoal = bombs.poll();
+            System.out.println("Muss in Deckung gehen");
+        } else
+            this.coverGoal = null;
+    }
+
+    private boolean bombHitPlayer(ApoSkunkmanAILevelSkunkman bomb) {
+        float xDiff = Math.abs(bomb.getX() - player.apoPlayer.getX());
+        float yDiff = Math.abs(bomb.getY() - player.apoPlayer.getY());
+        int radius = bomb.getSkunkWidth();
+
+        // PLAYER IS ON THE SAME LINE AS THE BOMB
+        // AND IN THE BOMG RADIUS
+        return ((xDiff == 0 || yDiff == 0) && (xDiff <= radius || yDiff <= radius));
+
+    }
+
     public void tick() {
+
+        // CHECK IF BOMB CAN KILL PLAYER
+        this.lookForBombs();
+
+        // HAVE TO TAKE COVER?
+        if (coverGoal != null) {
+            System.out.println("Geht in Deckung");
+            if (coverGoal.isFinished() || coverGoal.isCancelled()) {
+                System.out.println("Geht zur Deckung");
+                coverGoal.process();
+            } else {
+                System.out.println("Ist in Deckung");
+                coverGoal = null;
+                // recalculate way
+                ((WalkGoal) currentGoal).calculateWay(apoLevel);
+            }
+        }
+
         if (currentGoal.isFinished() || currentGoal.isCancelled()) {
             if (levelType == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X) {
                 if (!goalsForWalkLevel.isEmpty()) {
