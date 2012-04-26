@@ -17,7 +17,7 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  * begegnen.
  */
 
-public class KIManager {
+public class AIManager implements Updateable, Tickable {
 
     // KI MANAGER HAS ALL NECESSARY VALUES?
     boolean isInitialized = false;
@@ -38,7 +38,7 @@ public class KIManager {
     // GOALS FOR THE GOAL TYPE LEVEL
     private Queue<Goal> goalsForWalkLevel = new LinkedList<Goal>();
 
-    public KIManager() {
+    public AIManager() {
         // EMPTY CONSTRUCTOR
     }
 
@@ -115,10 +115,11 @@ public class KIManager {
 
     }
 
-    public void tick(ApoSkunkmanAILevel apoLevel, ApoSkunkmanAIPlayer apoPlayer) {
+    @Override
+    public void tick(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
 
         // UPDATE VALUES
-        this.update(apoLevel, apoPlayer);
+        this.update(apoPlayer, apoLevel);
 
         // CHECK IF BOMB CAN KILL PLAYER
         this.lookForBombs();
@@ -153,13 +154,14 @@ public class KIManager {
     }
 
     // UPDATING VALUES
-    private void update(ApoSkunkmanAILevel apoLevel, ApoSkunkmanAIPlayer apoPlayer) {
+    @Override
+    public void update(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
 
         if (isInitialized) {
             this.apoLevel = apoLevel;
-            this.player.update(apoPlayer);
+            this.player.update(apoPlayer, apoLevel);
         } else {
-            player = new MeldanorPlayer(apoPlayer);
+            player = new MeldanorPlayer(apoPlayer, apoLevel);
             this.apoLevel = apoLevel;
             levelType = apoLevel.getType();
             if (levelType == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X) {

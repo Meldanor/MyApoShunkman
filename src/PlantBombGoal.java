@@ -24,19 +24,42 @@ public class PlantBombGoal extends WalkGoal {
     /** Is the bomb planted? */
     private boolean bombPlanted = false;
 
+    /**
+     * Create a PlantBombGoal WITHOUT calculating the way to the bomb spot
+     * 
+     * @param bombSpot
+     *            The bombspot where the bomb should be planted
+     * @param player
+     *            The player
+     */
     public PlantBombGoal(final Point bombSpot, final MeldanorPlayer player) {
         super(bombSpot, player);
     }
 
+    /**
+     * Create a PlantBombGoal WITH calculating the way to the bomb spot
+     * 
+     * @param bombSpot
+     *            The bombspot where the bomb should be planted
+     * @param apoLevel
+     *            The apo level to find the way
+     * @param player
+     *            the player
+     */
     public PlantBombGoal(final Point bombSpot, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
         super(bombSpot, apoLevel, player);
     }
 
     @Override
+    /** @return The goal is finished when the bomb has been planted */
     public boolean isFinished() {
         return bombPlanted;
     }
 
+    /**
+     * While player is not at the bombspot, walk to it. When player is there,
+     * try to plant the bomb. Player will wait when he can't plant the bomb
+     */
     @Override
     public void process() {
         // GO TO BOMB SPOT
@@ -54,6 +77,7 @@ public class PlantBombGoal extends WalkGoal {
             return;
     }
 
+    /** @return GoalPriority.NORMAL */
     @Override
     public GoalPriority getPriority() {
         return GoalPriority.NORMAL;

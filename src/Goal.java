@@ -10,6 +10,7 @@
 
 public abstract class Goal implements Comparable<Goal> {
 
+    /** Is the goal canceled? Maybe it it obsolete*/
     private boolean isCancelled = false;
 
     /**
@@ -29,6 +30,9 @@ public abstract class Goal implements Comparable<Goal> {
         return isCancelled;
     }
 
+    /**
+     * Cancel the goal
+     */
     public void setCancelled() {
         isCancelled = true;
     }

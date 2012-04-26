@@ -14,7 +14,8 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class Meldanor extends ApoSkunkmanAI {
 
-    private KIManager kiManager;
+    // my AI
+    private AIManager AIManager;
 
     @Override
     public String getPlayerName() {
@@ -28,12 +29,12 @@ public class Meldanor extends ApoSkunkmanAI {
 
     @Override
     public void load(String path) {
-        kiManager = new KIManager();
+        AIManager = new AIManager();
     }
 
     @Override
     public void think(ApoSkunkmanAILevel level, ApoSkunkmanAIPlayer player) {
-        kiManager.tick(level, player);
+        AIManager.tick(player, level);
     }
 
 }

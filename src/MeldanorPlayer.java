@@ -20,12 +20,12 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  * @author Meldanor
  * 
  */
-public class MeldanorPlayer {
+public class MeldanorPlayer implements Updateable {
 
     public ApoSkunkmanAIPlayer apoPlayer;
 
-    public MeldanorPlayer(ApoSkunkmanAIPlayer apoPlayer) {
-        this.update(apoPlayer);
+    public MeldanorPlayer(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
+        this.update(apoPlayer, apoLevel);
     }
 
     public void moveTo(LinkedList<Node> path) {
@@ -63,7 +63,8 @@ public class MeldanorPlayer {
         return new Point((int) apoPlayer.getX(), (int) apoPlayer.getY());
     }
 
-    public void update(ApoSkunkmanAIPlayer apoPlayer) {
+    @Override
+    public void update(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
         this.apoPlayer = apoPlayer;
     }
 
