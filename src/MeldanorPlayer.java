@@ -1,6 +1,7 @@
 import java.awt.Point;
 import java.util.LinkedList;
 
+import apoSkunkman.ai.ApoSkunkmanAIConstants;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
@@ -22,40 +23,61 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  */
 public class MeldanorPlayer implements Updateable {
 
+    /** The apo player this MeldanorPlayer is wrapping around */
     public ApoSkunkmanAIPlayer apoPlayer;
+
+    /** The direction the player has walked */
+    private int direction = Integer.MIN_VALUE;
 
     public MeldanorPlayer(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
         this.update(apoPlayer, apoLevel);
     }
 
+    /**
+     * Remove the first node of the path and go to this node
+     * 
+     * @param path
+     *            A path where the distance of every node is only 1
+     */
     public void moveTo(LinkedList<Node> path) {
         moveTo(path.removeFirst());
     }
 
+    /**
+     * Go one step to the point
+     * 
+     * @param p
+     */
     public void moveTo(Point p) {
 
         // CALCULATE DIRECTION
         int diff = p.x - (int) apoPlayer.getX();
 
         // CHECK X-AXIS
-        if (diff > 0)
+        if (diff > 0) {
             apoPlayer.movePlayerRight();
-        else if (diff < 0)
+            direction = ApoSkunkmanAIConstants.PLAYER_DIRECTION_RIGHT;
+        } else if (diff < 0) {
             apoPlayer.movePlayerLeft();
-        else {
+            direction = ApoSkunkmanAIConstants.PLAYER_DIRECTION_LEFT;
+
+        } else {
             // CHECK Y-AXIS
             diff = p.y - (int) apoPlayer.getY();
-            if (diff > 0)
+            if (diff > 0) {
                 apoPlayer.movePlayerDown();
-            else if (diff < 0)
+                direction = ApoSkunkmanAIConstants.PLAYER_DIRECTION_DOWN;
+            } else if (diff < 0) {
                 apoPlayer.movePlayerUp();
+                direction = ApoSkunkmanAIConstants.PLAYER_DIRECTION_UP;
+            }
         }
     }
 
     public LinkedList<Node> findWay(final Point goal, final ApoSkunkmanAILevel apoLevel, boolean onlyFree) {
         AStar pathFinder = new AStar(apoLevel);
         pathFinder.update(apoLevel, goal);
-        pathFinder.findWay(new Point((int) apoPlayer.getX(), (int) apoPlayer.getY()), onlyFree);
+        pathFinder.findWay(getPosition(), onlyFree);
         return pathFinder.getPath();
     }
 
@@ -66,6 +88,14 @@ public class MeldanorPlayer implements Updateable {
     @Override
     public void update(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
         this.apoPlayer = apoPlayer;
+    }
+
+    /**
+     * @return The last walk direction. Integer.MIN_VALUE if player has never
+     *         walked
+     */
+    public int getDirection() {
+        return direction;
     }
 
 }
