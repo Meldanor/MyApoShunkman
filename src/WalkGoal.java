@@ -56,7 +56,7 @@ public class WalkGoal extends Goal {
      */
     public WalkGoal(final Point goal, final ApoSkunkmanAILevel apoLevel, final MeldanorPlayer player) {
         this(goal, player);
-        path = player.findWay(goal, apoLevel);
+        path = player.findWay(goal, apoLevel, true);
         // NO WAY FOUND
         if (path == null)
             setCancelled();
@@ -104,7 +104,7 @@ public class WalkGoal extends Goal {
      *            The level
      */
     public void calculateWay(ApoSkunkmanAILevel apoLevel) {
-        path = player.findWay(goal, apoLevel);
+        path = player.findWay(goal, apoLevel, true);
         // NO WAY FOUND
         if (path == null)
             setCancelled();

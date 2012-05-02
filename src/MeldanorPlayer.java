@@ -52,10 +52,10 @@ public class MeldanorPlayer implements Updateable {
         }
     }
 
-    public LinkedList<Node> findWay(final Point goal, final ApoSkunkmanAILevel apoLevel) {
+    public LinkedList<Node> findWay(final Point goal, final ApoSkunkmanAILevel apoLevel, boolean onlyFree) {
         AStar pathFinder = new AStar(apoLevel);
         pathFinder.update(apoLevel, goal);
-        pathFinder.findWay(new Point((int) apoPlayer.getX(), (int) apoPlayer.getY()));
+        pathFinder.findWay(new Point((int) apoPlayer.getX(), (int) apoPlayer.getY()), onlyFree);
         return pathFinder.getPath();
     }
 

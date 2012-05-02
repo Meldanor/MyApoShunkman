@@ -108,7 +108,7 @@ public class TakeCoverGoal extends Goal {
         byte[][] byteLevel = apoLevel.getLevelAsByte();
 
         // CHECK POSSIBILITES
-        Point[] possi = getDirectCover(start, radius, byteLevel);
+        List<Point> possi = getDirectCover(start, radius, byteLevel);
 
         // CALCULATE PATH TO EVERY POSSIBLE COVER
         List<LinkedList<Node>> paths = new ArrayList<LinkedList<Node>>(4);
@@ -117,7 +117,7 @@ public class TakeCoverGoal extends Goal {
             // THERE IS A COVER
             if (pos != null) {
                 // FIND THE WAY TO THE COVER
-                path = player.findWay(pos, apoLevel);
+                path = player.findWay(pos, apoLevel, true);
                 // A PATH TO THE COVER EXISTS
                 if (path != null) {
                     paths.add(path);
@@ -127,14 +127,17 @@ public class TakeCoverGoal extends Goal {
         }
 
         // DIDN'T FIND A COVER DIRECTLY
-        if (paths.isEmpty())
-            ;
+        if (paths.isEmpty()) {
+            System.out.println("lol");
+        }
         // TODO: SEARCH FOR COVERES THEIR AREN'T ON THE AXIS
         // TODO: THINK LIKE A JUMPER
 
         else {
             // FIND THE PATH WITH THE SHORTEST WAY
             path = Collections.min(paths, SHORTEST_PATH);
+            for (Node n : path)
+                System.out.println(n.x + ";" + n.y);
         }
 
     }
@@ -173,14 +176,20 @@ public class TakeCoverGoal extends Goal {
      * @return An Array with 4 Elements. When an element is null the cover is a
      *         stone or not in the field
      */
-    private Point[] getDirectCover(Point start, int radius, byte[][] byteLevel) {
-        // @formatter:off
-        return new Point[] {
-                getPoint(start.x + radius,  start.y,            byteLevel),
-                getPoint(start.x - radius,  start.y,            byteLevel),
-                getPoint(start.x ,          start.y + radius,   byteLevel),
-                getPoint(start.x ,          start.y - radius,   byteLevel),
-        };
-        // @formatter:on
+    private List<Point> getDirectCover(Point start, int radius, byte[][] byteLevel) {
+
+        int xMax = start.x + (radius / 2) + 1;
+        int yMax = start.y + (radius / 2) + 1;
+
+        List<Point> covers = new LinkedList<Point>();
+        Point cover = null;
+        for (int y = start.y - (radius / 2) - 1; y < yMax; ++y) {
+            for (int x = start.x - (radius / 2) - 1; x < xMax; ++x) {
+                cover = getPoint(x, y, byteLevel);
+                if (cover != null)
+                    covers.add(cover);
+            }
+        }
+        return covers;
     }
 }

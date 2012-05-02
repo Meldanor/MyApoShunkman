@@ -39,9 +39,9 @@ public class AStar {
         this.level.update(apoLevel, goal);
     }
 
-    public void findWay(Point start) {
+    public void findWay(Point start, boolean onlyFree) {
         // GET START NODE
-        Node current = level.getNode(start.x, start.y);
+        Node current = level.getNode(start.x, start.y,onlyFree);
         // ADD IT TO OPEN LIST
         openList.add(current);
         while (!openList.isEmpty()) {
@@ -57,7 +57,7 @@ public class AStar {
                 return;
 
             // GET POSSIBLE NEXT NODES
-            Node[] neighbors = level.getNeighbors(current);
+            Node[] neighbors = level.getNeighbors(current, onlyFree);
 
             // CHECK POSSIBILITIES
             for (Node neighbor : neighbors) {

@@ -54,7 +54,7 @@ public class AStarLevel {
         for (int y = 0; y < level.length; ++y) {
             // X-AXIS
             for (int x = 0; x < level[y].length; ++x) {
-                Node node = getNode(x, y);
+                Node node = getNode(x, y, false);
                 if (node != null) {
                     node = updateNode(node, goal, apoLevel, byteLevel[y][x]);
                     level[y][x] = node;
@@ -94,15 +94,22 @@ public class AStarLevel {
      *         a not walkable field on the position. Otherwise the node will
      *         returned
      */
-    public Node getNode(int x, int y) {
+    public Node getNode(int x, int y, boolean onlyFree) {
         // IS INSIDE THE FIELD
-        if (y < level.length && y >= 0 && x < level[y].length && x >= 0)
-            return level[y][x];
+        // TODO: Ueberarbeiten
+        if (y < level.length && y >= 0 && x < level[y].length && x >= 0) {
+            if (!onlyFree)
+                return level[y][x];
+            else if (byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_FREE || byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_GOODIE)
+                return level[y][x];
+            else
+                return null;
+        }
+
         // IS OUTSIDE
         else
             return null;
     }
-
     /**
      * Get and check the neighbors of the point. Neighbors have this format: <br>
      * 
@@ -115,13 +122,13 @@ public class AStarLevel {
      * @param p
      * @return
      */
-    public Node[] getNeighbors(Point p) {
+    public Node[] getNeighbors(Point p, boolean onlyFree) {
         // @formatter:off
         return new Node[] {
-            getNode(p.x + 1, p.y),
-            getNode(p.x - 1, p.y),
-            getNode(p.x, p.y + 1),
-            getNode(p.x, p.y - 1)
+            getNode(p.x + 1, p.y, onlyFree),
+            getNode(p.x - 1, p.y, onlyFree),
+            getNode(p.x, p.y + 1, onlyFree),
+            getNode(p.x, p.y - 1, onlyFree)
         };
         // @formatter:on
     }

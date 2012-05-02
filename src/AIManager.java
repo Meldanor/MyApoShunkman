@@ -44,7 +44,7 @@ public class AIManager implements Updateable, Tickable {
 
     private void handleGoalLevel() {
         // FIND WAY TO GOAL WITH BUSHES
-        LinkedList<Node> path = player.findWay(apoLevel.getGoalXPoint(), apoLevel);
+        LinkedList<Node> path = player.findWay(apoLevel.getGoalXPoint(), apoLevel, false);
         byte[][] byteLevel = apoLevel.getLevelAsByte();
 
         // LOOK AT THE PATH AND FILTER ALL BOMB SPOTS
@@ -83,12 +83,9 @@ public class AIManager implements Updateable, Tickable {
                 // THERE IS A BOMB
                 if (byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_SKUNKMAN) {
                     bomb = apoLevel.getSkunkman(y, x);
-                    System.out.println("Bomb found at " + x + ";" + y);
                     // BOMB CAN HIT PLAYER -> SEARCH AND TAKE COVER
                     if (bombHitPlayer(bomb)) {
                         bombs.add(new TakeCoverGoal(player, apoLevel, bomb));
-
-                        System.out.println("Bomb trifft");
                     }
                 }
             }
@@ -99,7 +96,6 @@ public class AIManager implements Updateable, Tickable {
             // TODO: Implement this
         } else if (bombs.size() == 1) {
             this.coverGoal = bombs.poll();
-            System.out.println("Muss in Deckung gehen");
         } else
             this.coverGoal = null;
     }
@@ -126,9 +122,7 @@ public class AIManager implements Updateable, Tickable {
 
         // HAVE TO TAKE COVER?
         if (coverGoal != null) {
-            System.out.println("Geht in Deckung");
-            if (coverGoal.isFinished() || coverGoal.isCancelled()) {
-                System.out.println("Geht zur Deckung");
+            if (!coverGoal.isFinished()) {
                 coverGoal.process();
             } else {
                 System.out.println("Ist in Deckung");
