@@ -102,13 +102,13 @@ public class TakeCoverGoal extends Goal {
      */
     private void findCover(ApoSkunkmanAILevel apoLevel) {
         // PLAYER POSITION
-        Point start = player.getPosition();
+//        Point start = player.getPosition();
         // THE RADIUS OF THE BOMB
-        int radius = bomb.getSkunkWidth() + 1;
+        int radius = bomb.getSkunkWidth() + 2;
         byte[][] byteLevel = apoLevel.getLevelAsByte();
 
         // CHECK POSSIBILITES
-        List<Point> possi = getDirectCover(start, radius, byteLevel);
+        List<Point> possi = getDirectCover(new Point((int) bomb.getX(), (int) bomb.getY()), radius, byteLevel);
 
         // CALCULATE PATH TO EVERY POSSIBLE COVER
         List<LinkedList<Node>> paths = new ArrayList<LinkedList<Node>>(4);
@@ -128,16 +128,20 @@ public class TakeCoverGoal extends Goal {
 
         // DIDN'T FIND A COVER DIRECTLY
         if (paths.isEmpty()) {
-            System.out.println("lol");
-        }
-        // TODO: SEARCH FOR COVERES THEIR AREN'T ON THE AXIS
-        // TODO: THINK LIKE A JUMPER
-
-        else {
+            System.out.println("Keine Deckung gefunden");
+        } else {
             // FIND THE PATH WITH THE SHORTEST WAY
-            path = Collections.min(paths, SHORTEST_PATH);
-            for (Node n : path)
-                System.out.println(n.x + ";" + n.y);
+//            path = Collections.min(paths, SHORTEST_PATH);
+//            int min = Integer.MAX_VALUE;
+//            for (LinkedList<Node> list : paths) {
+//                if (list.size() < min) {
+//                    min = list.size();
+//                    path = list;
+//                }
+//            }
+            path = paths.get(0);
+//            for (Node n : path)
+//                System.out.println(n.x + ";" + n.y);
         }
 
     }

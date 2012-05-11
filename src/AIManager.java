@@ -93,6 +93,9 @@ public class AIManager implements Updateable, Tickable {
 
         // LOOK FOR THE MOST RELEVANT GOAL
         if (bombs.size() > 1) {
+            {
+
+            }
             // TODO: Implement this
         } else if (bombs.size() == 1) {
             this.coverGoal = bombs.poll();
@@ -124,8 +127,8 @@ public class AIManager implements Updateable, Tickable {
         if (coverGoal != null) {
             if (!coverGoal.isFinished()) {
                 coverGoal.process();
+                return;
             } else {
-                System.out.println("Ist in Deckung");
                 coverGoal = null;
                 // recalculate way
                 ((WalkGoal) currentGoal).calculateWay(apoLevel);

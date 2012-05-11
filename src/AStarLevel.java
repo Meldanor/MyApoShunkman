@@ -96,20 +96,31 @@ public class AStarLevel {
      */
     public Node getNode(int x, int y, boolean onlyFree) {
         // IS INSIDE THE FIELD
-        // TODO: Ueberarbeiten
-        if (y < level.length && y >= 0 && x < level[y].length && x >= 0) {
+        if (isInside(x, y)) {
+            // DON'T CARE WHAT TILE IT IS
             if (!onlyFree)
                 return level[y][x];
-            else if (byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_FREE || byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_GOODIE)
+            // RETURN ONLY NODE WHEN WAY IS FREE
+            else if (isFree(x, y))
                 return level[y][x];
+            // NO ACCESSABLE POINT
             else
                 return null;
         }
-
         // IS OUTSIDE
         else
             return null;
     }
+
+    private boolean isInside(int x, int y) {
+        return y < level.length && y >= 0 && x < level[y].length && x >= 0;
+    }
+
+    private boolean isFree(int x, int y) {
+        byte tile = byteLevel[y][x];
+        return tile == ApoSkunkmanAIConstants.LEVEL_FREE || tile == ApoSkunkmanAIConstants.LEVEL_GOODIE || tile == ApoSkunkmanAIConstants.LEVEL_SKUNKMAN;
+    }
+
     /**
      * Get and check the neighbors of the point. Neighbors have this format: <br>
      * 

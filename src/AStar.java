@@ -41,7 +41,7 @@ public class AStar {
 
     public void findWay(Point start, boolean onlyFree) {
         // GET START NODE
-        Node current = level.getNode(start.x, start.y,onlyFree);
+        Node current = level.getNode(start.x, start.y, onlyFree);
         // ADD IT TO OPEN LIST
         openList.add(current);
         while (!openList.isEmpty()) {
