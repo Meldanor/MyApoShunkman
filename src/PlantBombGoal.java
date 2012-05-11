@@ -62,6 +62,12 @@ public class PlantBombGoal extends WalkGoal {
      */
     @Override
     public void process() {
+        if (path == null) {
+//            System.out.println(goal);
+//            System.out.println(player.getPosition());
+            setCancelled();
+            return;
+        }
         // GO TO BOMB SPOT
         if (!path.isEmpty())
             player.moveTo(path);
