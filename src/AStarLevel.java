@@ -112,11 +112,11 @@ public class AStarLevel {
             return null;
     }
 
-    private boolean isInside(int x, int y) {
+    public boolean isInside(int x, int y) {
         return y < level.length && y >= 0 && x < level[y].length && x >= 0;
     }
 
-    private boolean isFree(int x, int y) {
+    public boolean isFree(int x, int y) {
         byte tile = byteLevel[y][x];
         return tile == ApoSkunkmanAIConstants.LEVEL_FREE || tile == ApoSkunkmanAIConstants.LEVEL_GOODIE || tile == ApoSkunkmanAIConstants.LEVEL_SKUNKMAN;
     }
