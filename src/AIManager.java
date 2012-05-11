@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -75,7 +76,7 @@ public class AIManager implements Updateable, Tickable {
         byte[][] byteLevel = apoLevel.getLevelAsByte();
 
         ApoSkunkmanAILevelSkunkman bomb = null;
-        Queue<Goal> bombs = new LinkedList<Goal>();
+        LinkedList<TakeCoverGoal> bombs = new LinkedList<TakeCoverGoal>();
 
         // ITERATE OVER ALL POINTS
         for (int y = 0; y < byteLevel.length; ++y) {
@@ -84,26 +85,39 @@ public class AIManager implements Updateable, Tickable {
                 if (byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_SKUNKMAN) {
                     bomb = apoLevel.getSkunkman(y, x);
                     // BOMB CAN HIT PLAYER -> SEARCH AND TAKE COVER
-                    if (bombHitPlayer(bomb)) {
+                    if (canHitPlayer(bomb))
                         bombs.add(new TakeCoverGoal(player, apoLevel, bomb));
-                    }
+
                 }
             }
         }
 
         // LOOK FOR THE MOST RELEVANT GOAL
         if (bombs.size() > 1) {
-            {
+            // FIND OUT WHICH BOMB IS THE NEAREST
+            // THE SHORTEST BOMB IS THE BOMB WITH HIGH PRIORITY
+            double distance = Double.MAX_VALUE;
+            double curDistance = 0.0;
+            Point bombSpot = null;
+            Point playerPos = player.getPosition();
 
+            for (TakeCoverGoal goal : bombs) {
+                bombSpot = goal.getBombPosition();
+                curDistance = Math.abs(playerPos.distance(bombSpot));
+                // IS CURRENT BOMB IS NEARER THEN REFERENCE?
+                if (curDistance < distance) {
+                    distance = curDistance;
+                    this.coverGoal = goal;
+                }
             }
-            // TODO: Implement this
-        } else if (bombs.size() == 1) {
-            this.coverGoal = bombs.poll();
-        } else
+
+        } else if (bombs.size() == 1)
+            this.coverGoal = bombs.getFirst();
+        else
             this.coverGoal = null;
     }
 
-    private boolean bombHitPlayer(ApoSkunkmanAILevelSkunkman bomb) {
+    private boolean canHitPlayer(ApoSkunkmanAILevelSkunkman bomb) {
         float xDiff = Math.abs(bomb.getX() - player.apoPlayer.getX());
         float yDiff = Math.abs(bomb.getY() - player.apoPlayer.getY());
         int radius = bomb.getSkunkWidth();
@@ -123,15 +137,17 @@ public class AIManager implements Updateable, Tickable {
         // CHECK IF BOMB CAN KILL PLAYER
         this.lookForBombs();
 
-        // HAVE TO TAKE COVER?
+        // HAVE TO TAKE COVER GOAL?
         if (coverGoal != null) {
             if (!coverGoal.isFinished()) {
                 coverGoal.process();
                 return;
             } else {
                 coverGoal = null;
+                System.out.println("Das goal ist fertig");
                 // recalculate way
                 ((WalkGoal) currentGoal).calculateWay(apoLevel);
+
             }
         }
 
