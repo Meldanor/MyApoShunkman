@@ -68,8 +68,7 @@ public class TakeCoverGoal extends Goal {
     @Override
     public boolean isFinished() {
         // PLAYER HAS TAKEN COVER OR BOMB HAS EXPLODED
-        System.out.println(bomb.getTimeToExplosion());
-        return bomb.getTimeToExplosion() < 0;
+        return bomb.getTimeToExplosion() <= 0;
     }
 
     /**
@@ -85,13 +84,6 @@ public class TakeCoverGoal extends Goal {
         else
             player.moveTo(path);
 
-    }
-
-    @Override
-    public void setCancelled() {
-        // TODO Auto-generated method stub
-        super.setCancelled();
-        System.out.println("Wurde gecanceld");
     }
 
     /**
@@ -184,146 +176,219 @@ public class TakeCoverGoal extends Goal {
         byte[][] byteLevel = apoLevel.getLevelAsByte();
 
         List<Point> covers = new LinkedList<Point>();
-        // LOOK FOR A COVER ON THE AXIS AND STORE THEM IN COVERS
-        checkAxis(start.x, start.y, radius, byteLevel, covers);
-        // LOOK FOR ANOTHER COVER - SEE SCHEMATA IN FUNCTION
-        checkOtherCover(start.x, start.y, byteLevel, covers);
+        findCover(start.x, start.y, radius, byteLevel, covers);
+//        // LOOK FOR A COVER ON THE AXIS AND STORE THEM IN COVERS
+//        checkAxis(start.x, start.y, radius, byteLevel, covers);
+//        // LOOK FOR ANOTHER COVER - SEE SCHEMATA IN FUNCTION
+//        checkOtherCover(start.x, start.y, byteLevel, covers);
 
         return covers;
     }
 
-    private void checkAxis(int xS, int yS, int radius, byte[][] byteLevel, List<Point> covers) {
+    private void findCover(int xS, int yS, int radius, byte[][] byteLevel, List<Point> covers) {
 
-        // -X AXIS FROM LEFT TO RIGHT - FROM BOMB SPOT GO LEFT
-        Point minusX = getPoint(xS - radius - 1, yS, byteLevel);
-        // Possible cover
-        if (minusX != null) {
-            // look if there is a direct way to the cover
-            for (int x = minusX.x + 1; x < xS; ++x) {
-                // there is a barrier on the way - no good cover
-                if (getPoint(x, yS, byteLevel) == null) {
-                    minusX = null;
-                    break;
-                }
-            }
-            if (minusX != null)
-                covers.add(minusX);
-        }
+        // INDICATES WHETHER THERE IS A WAY ON THE AXIS
+        boolean posX = true;
+        boolean negX = true;
+        boolean posY = true;
+        boolean negY = true;
 
-        // +X AXIS FROM RIGHT TO LEFT - FROM BOMB SPOT GO RIGHT
-        Point plusX = getPoint(xS + radius + 1, yS, byteLevel);
-        // Possible cover
-        if (plusX != null) {
-            // look if there is a direct way to the cover
-            for (int x = plusX.x - 1; x > xS; --x) {
-                // there is a barrier on the way - no good cover
-                if (getPoint(x, yS, byteLevel) == null) {
-                    plusX = null;
-                    break;
-                }
-            }
-            if (plusX != null)
-                covers.add(plusX);
-        }
-
-        // -Y AXIS FROM BOTTOM TO TOP - FROM BOMB SPOT GO DOWN
-        Point minusY = getPoint(xS, yS - radius - 1, byteLevel);
-        // Possible cover
-        if (minusY != null) {
-            // look if there is a direct way to the cover
-            for (int y = minusY.x + 1; y < yS; ++y) {
-                // there is a barrier on the way - no good cover
-                if (getPoint(xS, y, byteLevel) == null) {
-                    minusY = null;
-                    break;
-                }
-            }
-            if (minusY != null)
-                covers.add(minusY);
-        }
-
-        // +Y AXIS FROM TOP TO BOTTOM - FROM BOMB SPOT GO UP
-        Point plusY = getPoint(xS, yS + radius + 1, byteLevel);
-        // Possible cover
-        if (plusY != null) {
-            // look if there is a direct way to the cover
-            for (int y = plusY.x - 1; y > yS; --y) {
-                // there is a barrier on the way - no good cover
-                if (getPoint(xS, y, byteLevel) == null) {
-                    plusY = null;
-                    break;
-                }
-            }
-            if (plusY != null)
-                covers.add(plusY);
-        }
-    }
-
-    private void checkOtherCover(int xS, int yS, byte[][] byteLevel, List<Point> covers) {
-
-        // the current checked cover
+        // TEMP VARI
         Point cover = null;
+        // THE OFFSET
+        int i = 1;
+        for (; i <= radius + 1; ++i) {
 
-        // @formatter:off        
-        /* THE SCHEMATA FOR FINDING POSSIBLE COVERS
-         * 
-         *      *   6   *   7   *
-         *      5   1   *   2   8
-         *      *   *   B   *   *
-         *      9   3   *   4   11
-         *      *   10  *   12  *
-         * 
-         */
-        // @formatter:on
+            // CHECK NEGATIVE X-OFFSET
+            if (negX) {
+                cover = getPoint(xS - i, yS, byteLevel);
+                if (cover == null)
+                    negX = false;
+                else {
+                    checkCover(xS - i, yS - 1, byteLevel, covers);
+                    checkCover(xS - i, yS + 1, byteLevel, covers);
+                }
+            }
+            // CHECK POSITIVE X-OFFSET
+            if (posX) {
+                cover = getPoint(xS + i, yS, byteLevel);
+                if (cover == null)
+                    posX = false;
+                else {
+                    checkCover(xS + i, yS - 1, byteLevel, covers);
+                    checkCover(xS + i, yS + 1, byteLevel, covers);
+                }
+            }
+            // CHECK NEGATIVE Y-OFFSET
+            if (negY) {
+                cover = getPoint(xS, yS - i, byteLevel);
+                if (cover == null)
+                    negY = false;
+                else {
+                    checkCover(xS - 1, yS - i, byteLevel, covers);
+                    checkCover(xS + 1, yS - i, byteLevel, covers);
+                }
+            }
+            // CHECK POSITIVE Y-OFFSET
+            if (posY) {
+                cover = getPoint(xS, yS + i, byteLevel);
+                if (cover == null)
+                    posY = false;
+                else {
+                    checkCover(xS - 1, yS + i, byteLevel, covers);
+                    checkCover(xS + 1, yS + i, byteLevel, covers);
+                }
+            }
+        }
 
-        // 1
-        cover = getPoint(xS - 1, yS - 1, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 2
-        cover = getPoint(xS + 1, yS - 1, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 3
-        cover = getPoint(xS - 1, yS + 1, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 4
-        cover = getPoint(xS + 1, yS + 1, byteLevel);
-        if (cover != null)
-            covers.add(cover);
+        if (negX)
+            checkCover(xS - i, yS, byteLevel, covers);
+        if (posX)
+            checkCover(xS + i, yS, byteLevel, covers);
+        if (negY)
+            checkCover(xS, yS - i, byteLevel, covers);
+        if (posY)
+            checkCover(xS, yS + i, byteLevel, covers);
+    }
 
-        // 5
-        cover = getPoint(xS - 2, yS - 1, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 6
-        cover = getPoint(xS - 1, yS - 2, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 7
-        cover = getPoint(xS + 1, yS - 2, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 8
-        cover = getPoint(xS + 2, yS - 1, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 9
-        cover = getPoint(xS - 2, yS + 1, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 10
-        cover = getPoint(xS - 1, yS + 2, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 11
-        cover = getPoint(xS + 2, yS + 1, byteLevel);
-        if (cover != null)
-            covers.add(cover);
-        // 12
-        cover = getPoint(xS + 1, yS + 2, byteLevel);
+    private void checkCover(int xS, int yS, byte[][] byteLevel, List<Point> covers) {
+        Point cover = getPoint(xS, yS, byteLevel);
         if (cover != null)
             covers.add(cover);
     }
+
+//    private void checkAxis(int xS, int yS, int radius, byte[][] byteLevel, List<Point> covers) {
+//
+//        // -X AXIS FROM LEFT TO RIGHT - FROM BOMB SPOT GO LEFT
+//        Point minusX = getPoint(xS - radius - 1, yS, byteLevel);
+//        // Possible cover
+//        if (minusX != null) {
+//            // look if there is a direct way to the cover
+//            for (int x = minusX.x + 1; x < xS; ++x) {
+//                // there is a barrier on the way - no good cover
+//                if (getPoint(x, yS, byteLevel) == null) {
+//                    minusX = null;
+//                    break;
+//                }
+//            }
+//            if (minusX != null)
+//                covers.add(minusX);
+//        }
+//
+//        // +X AXIS FROM RIGHT TO LEFT - FROM BOMB SPOT GO RIGHT
+//        Point plusX = getPoint(xS + radius + 1, yS, byteLevel);
+//        // Possible cover
+//        if (plusX != null) {
+//            // look if there is a direct way to the cover
+//            for (int x = plusX.x - 1; x > xS; --x) {
+//                // there is a barrier on the way - no good cover
+//                if (getPoint(x, yS, byteLevel) == null) {
+//                    plusX = null;
+//                    break;
+//                }
+//            }
+//            if (plusX != null)
+//                covers.add(plusX);
+//        }
+//
+//        // -Y AXIS FROM BOTTOM TO TOP - FROM BOMB SPOT GO DOWN
+//        Point minusY = getPoint(xS, yS - radius - 1, byteLevel);
+//        // Possible cover
+//        if (minusY != null) {
+//            // look if there is a direct way to the cover
+//            for (int y = minusY.x + 1; y < yS; ++y) {
+//                // there is a barrier on the way - no good cover
+//                if (getPoint(xS, y, byteLevel) == null) {
+//                    minusY = null;
+//                    break;
+//                }
+//            }
+//            if (minusY != null)
+//                covers.add(minusY);
+//        }
+//
+//        // +Y AXIS FROM TOP TO BOTTOM - FROM BOMB SPOT GO UP
+//        Point plusY = getPoint(xS, yS + radius + 1, byteLevel);
+//        // Possible cover
+//        if (plusY != null) {
+//            // look if there is a direct way to the cover
+//            for (int y = plusY.x - 1; y > yS; --y) {
+//                // there is a barrier on the way - no good cover
+//                if (getPoint(xS, y, byteLevel) == null) {
+//                    plusY = null;
+//                    break;
+//                }
+//            }
+//            if (plusY != null)
+//                covers.add(plusY);
+//        }
+//    }
+//
+//    private void checkOtherCover(int xS, int yS, byte[][] byteLevel, List<Point> covers) {
+//
+//        // the current checked cover
+//        Point cover = null;
+//
+//        // @formatter:off        
+//        /* THE SCHEMATA FOR FINDING POSSIBLE COVERS
+//         * 
+//         *      *   6   *   7   *
+//         *      5   1   *   2   8
+//         *      *   *   B   *   *
+//         *      9   3   *   4   11
+//         *      *   10  *   12  *
+//         * 
+//         */
+//        // @formatter:on
+//
+//        // 1
+//        cover = getPoint(xS - 1, yS - 1, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 2
+//        cover = getPoint(xS + 1, yS - 1, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 3
+//        cover = getPoint(xS - 1, yS + 1, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 4
+//        cover = getPoint(xS + 1, yS + 1, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//
+//        // 5
+//        cover = getPoint(xS - 2, yS - 1, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 6
+//        cover = getPoint(xS - 1, yS - 2, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 7
+//        cover = getPoint(xS + 1, yS - 2, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 8
+//        cover = getPoint(xS + 2, yS - 1, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 9
+//        cover = getPoint(xS - 2, yS + 1, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 10
+//        cover = getPoint(xS - 1, yS + 2, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 11
+//        cover = getPoint(xS + 2, yS + 1, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//        // 12
+//        cover = getPoint(xS + 1, yS + 2, byteLevel);
+//        if (cover != null)
+//            covers.add(cover);
+//    }
 }
