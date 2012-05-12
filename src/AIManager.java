@@ -63,7 +63,6 @@ public class AIManager implements Updateable, Tickable {
             }
         }
         goalsForWalkLevel.add(new WalkGoal(apoLevel.getGoalXPoint(), player));
-        System.out.println("Ziele: " + goalsForWalkLevel.size());
 
         // PROCESS FIRST GOAL
         currentGoal = goalsForWalkLevel.poll();
@@ -148,17 +147,19 @@ public class AIManager implements Updateable, Tickable {
                 coverGoal = null;
                 // recalculate way
                 ((WalkGoal) currentGoal).calculateWay(apoLevel);
-                System.out.println("Ziele: " + goalsForWalkLevel.size());
-
             }
         }
 
         if (currentGoal.isFinished() || currentGoal.isCancelled()) {
             if (levelType == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X) {
-                System.out.println("Ziele: " + goalsForWalkLevel.size());
                 if (!goalsForWalkLevel.isEmpty()) {
                     currentGoal = goalsForWalkLevel.poll();
                     ((WalkGoal) currentGoal).calculateWay(apoLevel);
+                    // UGLY FIX!
+                    if (currentGoal.isCancelled()) {
+                        player.goBack();
+                        ((WalkGoal) currentGoal).calculateWay(apoLevel);
+                    }
                 } else {
                     System.out.println("Keine weiteren Ziele");
                     return;
@@ -172,7 +173,6 @@ public class AIManager implements Updateable, Tickable {
         }
         currentGoal.process();
     }
-
     // UPDATING VALUES
     @Override
     public void update(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {

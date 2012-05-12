@@ -74,6 +74,28 @@ public class MeldanorPlayer implements Updateable {
         }
     }
 
+    public void goBack() {
+        switch (direction) {
+            case ApoSkunkmanAIConstants.PLAYER_DIRECTION_RIGHT :
+                apoPlayer.movePlayerLeft();
+                break;
+            case ApoSkunkmanAIConstants.PLAYER_DIRECTION_LEFT :
+                apoPlayer.movePlayerRight();
+                break;
+            case ApoSkunkmanAIConstants.PLAYER_DIRECTION_DOWN :
+                apoPlayer.movePlayerUp();
+                break;
+            case ApoSkunkmanAIConstants.PLAYER_DIRECTION_UP :
+                apoPlayer.movePlayerDown();
+                break;
+            default :
+                System.out.println("Kann nicht rückwärts gehen :(");
+                break;
+
+        }
+        direction = Integer.MIN_VALUE;
+    }
+
     public LinkedList<Node> findWay(final Point goal, final ApoSkunkmanAILevel apoLevel, boolean onlyFree) {
         AStar pathFinder = new AStar(apoLevel);
         pathFinder.update(apoLevel, goal);
