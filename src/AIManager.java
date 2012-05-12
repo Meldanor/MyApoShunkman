@@ -37,13 +37,14 @@ public class AIManager implements Updateable, Tickable {
     private Goal coverGoal;
 
     // GOALS FOR THE GOAL TYPE LEVEL
-    private Queue<Goal> goalsForWalkLevel = new LinkedList<Goal>();
+    private Queue<Goal> goalsForWalkLevel;
 
     public AIManager() {
         // EMPTY CONSTRUCTOR
     }
 
     private void handleGoalLevel() {
+        goalsForWalkLevel = new LinkedList<Goal>();
         // FIND WAY TO GOAL WITH BUSHES
         LinkedList<Node> path = player.findWay(apoLevel.getGoalXPoint(), apoLevel, false);
         byte[][] byteLevel = apoLevel.getLevelAsByte();
@@ -59,7 +60,10 @@ public class AIManager implements Updateable, Tickable {
             if (byteLevel[cur.y][cur.x] == ApoSkunkmanAIConstants.LEVEL_BUSH) {
                 // CREATE GOALS WITHOUT THE PATH - CALCULATE THEM WHEN IT IS
                 // NEEDED
-                goalsForWalkLevel.add(new PlantBombGoal(prev.getLocation(), player));
+                if (prev == null)
+                    goalsForWalkLevel.add(new PlantBombGoal(cur.getLocation(), player));
+                else
+                    goalsForWalkLevel.add(new PlantBombGoal(prev.getLocation(), player));
             }
         }
         goalsForWalkLevel.add(new WalkGoal(apoLevel.getGoalXPoint(), player));
@@ -161,7 +165,9 @@ public class AIManager implements Updateable, Tickable {
                         ((WalkGoal) currentGoal).calculateWay(apoLevel);
                     }
                 } else {
-                    System.out.println("Keine weiteren Ziele");
+                    System.out.println("Kalkuliere erneut");
+                    
+                    handleGoalLevel();
                     return;
 
                 }
