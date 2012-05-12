@@ -104,9 +104,11 @@ public class WalkGoal extends Goal {
      *            The level
      */
     public void calculateWay(ApoSkunkmanAILevel apoLevel) {
-        path = player.findWay(goal, apoLevel, true);
+        path = player.findWay(goal, apoLevel, false);
         // NO WAY FOUND
-        if (path == null)
+        if (path == null) {
             setCancelled();
+            System.out.println("Kein Weg gefunden zu " + goal);
+        }
     }
 }

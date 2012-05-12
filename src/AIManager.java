@@ -63,6 +63,7 @@ public class AIManager implements Updateable, Tickable {
             }
         }
         goalsForWalkLevel.add(new WalkGoal(apoLevel.getGoalXPoint(), player));
+        System.out.println("Ziele: " + goalsForWalkLevel.size());
 
         // PROCESS FIRST GOAL
         currentGoal = goalsForWalkLevel.poll();
@@ -135,7 +136,8 @@ public class AIManager implements Updateable, Tickable {
         this.update(apoPlayer, apoLevel);
 
         // CHECK IF BOMB CAN KILL PLAYER
-        this.lookForBombs();
+        if (coverGoal == null)
+            this.lookForBombs();
 
         // HAVE TO TAKE COVER GOAL?
         if (coverGoal != null) {
@@ -144,21 +146,26 @@ public class AIManager implements Updateable, Tickable {
                 return;
             } else {
                 coverGoal = null;
-                System.out.println("Das goal ist fertig");
                 // recalculate way
                 ((WalkGoal) currentGoal).calculateWay(apoLevel);
+                System.out.println("Ziele: " + goalsForWalkLevel.size());
 
             }
         }
 
         if (currentGoal.isFinished() || currentGoal.isCancelled()) {
             if (levelType == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X) {
+                System.out.println("Ziele: " + goalsForWalkLevel.size());
                 if (!goalsForWalkLevel.isEmpty()) {
                     currentGoal = goalsForWalkLevel.poll();
                     ((WalkGoal) currentGoal).calculateWay(apoLevel);
-                } else
+                } else {
+                    System.out.println("Keine weiteren Ziele");
                     return;
+
+                }
             } else {
+                System.out.println("Muss was neues finden :/");
                 // TODO: FIND A NEW ONE
             }
 
