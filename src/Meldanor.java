@@ -15,7 +15,8 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 public class Meldanor extends ApoSkunkmanAI {
 
     // my AI
-    private AIManager AIManager;
+//    private AIManager AIManager;
+    private Tickable AI;
 
     @Override
     public String getPlayerName() {
@@ -29,12 +30,13 @@ public class Meldanor extends ApoSkunkmanAI {
 
     @Override
     public void load(String path) {
-        AIManager = new AIManager();
+//        AI = new AIManager();
+        AI = new CheatAI();
     }
 
     @Override
     public void think(ApoSkunkmanAILevel level, ApoSkunkmanAIPlayer player) {
-        AIManager.tick(player, level);
+        AI.tick(player, level);
     }
 
 }
