@@ -39,4 +39,10 @@ public class Meldanor extends ApoSkunkmanAI {
         AI.tick(player, level);
     }
 
+    @Override
+    public String getImage() {
+        // © BY http://blogs.igalia.com/xrcalvar/files/2012/05/Dancing_Troll.gif
+        return "DancingTroll.png";
+    }
+
 }
