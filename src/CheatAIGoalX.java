@@ -227,7 +227,7 @@ public class CheatAIGoalX implements Tickable, Initiateable {
     private BufferedImage replacedChestImage2;
 
     private void undoFunnyStuff() throws Exception {
-
+        
         funnyStuffActive = false;
     }
 
