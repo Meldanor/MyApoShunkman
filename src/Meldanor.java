@@ -8,11 +8,15 @@
  * begegnen.
  */
 
+import java.io.File;
+
 import apoSkunkman.ai.ApoSkunkmanAI;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class Meldanor extends ApoSkunkmanAI {
+
+    public static File DIR;
 
     // my AI
 //    private AIManager AIManager;
@@ -30,6 +34,7 @@ public class Meldanor extends ApoSkunkmanAI {
 
     @Override
     public void load(String path) {
+        DIR = new File(path);
 //        AI = new AIManager();
         AI = new CheatAI();
     }
