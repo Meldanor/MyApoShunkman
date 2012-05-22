@@ -11,7 +11,7 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  * begegnen.
  */
 
-public class CheatAIHuman implements Tickable, Initiateable {
+public class CheatAIHuman implements Tickable, Initiationable {
 
     private boolean isInit = false;
 

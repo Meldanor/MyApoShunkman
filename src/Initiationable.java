@@ -11,7 +11,7 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  * begegnen.
  */
 
-public interface Initiateable {
+public interface Initiationable {
 
     public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel);
 

@@ -16,7 +16,7 @@ import apoSkunkman.entity.ApoSkunkmanPlayer;
  * begegnen.
  */
 
-public class CheatAIBots implements Initiateable, Tickable {
+public class CheatAIBots implements Initiationable, Tickable {
 
     private boolean isInit = false;
 

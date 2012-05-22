@@ -25,7 +25,7 @@ import apoSkunkman.level.ApoSkunkmanLevel;
  * begegnen.
  */
 
-public class CheatAIGoalX implements Tickable, Initiateable {
+public class CheatAIGoalX implements Tickable, Initiationable {
 
     private ApoSkunkmanAIPlayer apoPlayer;
     private ApoSkunkmanAILevel apoLevel;
