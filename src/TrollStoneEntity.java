@@ -1,7 +1,7 @@
 import java.awt.image.BufferedImage;
 
 import apoSkunkman.ApoSkunkmanConstants;
-import apoSkunkman.entity.ApoSkunkmanEntity;
+import apoSkunkman.entity.ApoSkunkmanStone;
 
 /*
  * Copyright (C) 2012 Kilian Gaertner
@@ -13,7 +13,7 @@ import apoSkunkman.entity.ApoSkunkmanEntity;
  * begegnen.
  */
 
-public class TrollStoneEntity extends ApoSkunkmanEntity {
+public class TrollStoneEntity extends ApoSkunkmanStone {
 
     private static BufferedImage trollStoneImage;
 

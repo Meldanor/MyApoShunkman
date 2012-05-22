@@ -135,7 +135,7 @@ public class CheatAIBots implements Initiationable, Tickable {
         entityField[y][x - 1] = new TrollStoneEntity(x - 1, y);
 
         // UNSURE WHETHER THIS IS NEEDED
-        // level.getGame().makeBackground(false, false, false, false);
+         level.getGame().makeBackground(false, false, false, false);
     }
 
     @Override
