@@ -3,6 +3,9 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -71,6 +74,7 @@ public class CheatAIGoalX implements Tickable, Initiationable {
             clearField();
 
             setStartPoints();
+            generateGoalPath();
 
 //            originalChestImage = ApoSkunkmanImageContainer.iGoalX;
 
@@ -125,16 +129,13 @@ public class CheatAIGoalX implements Tickable, Initiationable {
             init(apoPlayer, apoLevel);
     }
 
-    private long runawayTimer = 5000L;
-
     private void handleLevel(long delta) {
         try {
             // MOVE THE GOAL UNTIL TIMER IS REACHED
-            if ((runawayTimer -= delta) >= 0)
-                moveGoal();
+            moveGoal();
 
             // 500 ms BEFORE END PREPARE THE CHEST FOR CATCH
-            if (runawayTimer - 500 <= 0)
+            if (goalPath.size() <= 1)
                 prepareChest();
             else
                 // CHANGE THE IMAGE EVERY TICK
@@ -147,50 +148,110 @@ public class CheatAIGoalX implements Tickable, Initiationable {
             e.printStackTrace();
         }
     }
-
     private void setStartPoints() throws Exception {
 
         // Randomize start point for the goal
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
         Point goal = (Point) goalPointField.get(level);
 
-        int width = apoLevel.getLevelAsByte().length - 3;
-        int x = RAND.nextInt(width) + 1;
-        int y = RAND.nextInt(width) + 1;
-        goal.x = x;
-        goal.y = y;
-
+        // GOAL START IN THE MIDDLE OF THE FIELD
+        goal.x = (int) (ApoSkunkmanConstants.LEVEL_WIDTH / 2);
+        goal.y = (int) (ApoSkunkmanConstants.LEVEL_HEIGHT / 2);
         // now calculate the players start position
 
         ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
 
         // PLAYER ALWAYS START ON THE LEFT SIDE OF THE GOAL
-        player.setX((x - 1) * ApoSkunkmanConstants.TILE_SIZE);
-        player.setY(y * ApoSkunkmanConstants.TILE_SIZE);
+        player.setX((goal.x - 1) * ApoSkunkmanConstants.TILE_SIZE);
+        player.setY(goal.y * ApoSkunkmanConstants.TILE_SIZE);
     }
 
+    private void generateGoalPath() throws Exception {
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        Point goal = (Point) goalPointField.get(level);
+        int curX = goal.x;
+        int curY = goal.y;
+
+//        int pathSize = RAND.nextInt(40) + 10;
+        int pathSize = 500;
+        LinkedList<Point> pathList = new LinkedList<Point>();
+
+        int directionX = 1;
+        int directionY = 0;
+        int tempSize = RAND.nextInt(3) + 2;
+        for (int i = 0; i < tempSize; ++i) {
+            curX += directionX;
+            curY += directionY;
+            if (isInside(curX, curY))
+                pathList.add(new Point(curX, curY));
+            else
+                break;
+        }
+
+        int tempP = 0;
+        boolean b = false;
+        while (pathList.size() < pathSize) {
+            tempP = pathList.size();
+            if (directionX == 0) {
+                directionX = (RAND.nextBoolean() ? 1 : -1);
+                directionY = 0;
+            } else if (directionY == 0) {
+                directionX = 0;
+                directionY = (RAND.nextBoolean() ? 1 : -1);
+            }
+            tempSize = RAND.nextInt(3) + 2;
+
+            in : for (int i = 0; i < tempSize; ++i) {
+                curX += directionX;
+                curY += directionY;
+                if (isInside(curX, curY))
+                    pathList.add(new Point(curX, curY));
+                else
+                    break in;
+            }
+            System.out.println(pathList.size());
+            if (tempP == pathList.size()) {
+                if (b) {
+                    break;
+                } else
+                    b = true;
+            } else
+                b = false;
+
+        }
+
+        goalPath = pathList;
+        playerPath = new LinkedList<Point>();
+        playerPath.add(new Point(goal));
+        playerPath.addAll(pathList);
+
+    }
+    private boolean isInside(int x, int y) {
+        return x >= 1 && y >= 1 && x < ApoSkunkmanConstants.LEVEL_WIDTH - 1 && y < ApoSkunkmanConstants.LEVEL_HEIGHT - 1;
+    }
+
+    private Queue<Point> goalPath;
+
     private void moveGoal() throws Exception {
-        Random rand = new Random();
+        if (goalPath.isEmpty())
+            return;
+
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
         Point goal = (Point) goalPointField.get(level);
 
-        int dx = (rand.nextBoolean() ? 1 : -1);
-        int dy = (rand.nextBoolean() ? 1 : -1);
-
-        int x = (int) (dx + apoPlayer.getX());
-        int y = (int) (dy + apoPlayer.getY());
-
-        if (x < 0 || x > ApoSkunkmanConstants.LEVEL_WIDTH - 2 || y < 0 || y > ApoSkunkmanConstants.LEVEL_HEIGHT - 2) {
-            setStartPoints();
-
-        } else
-            goal.setLocation(x, y);
+        goal.setLocation(goalPath.poll());
 
     }
 
-    private void movePlayer() {
+    private Queue<Point> playerPath;
 
-        Point p = apoLevel.getGoalXPoint();
+    private void movePlayer() {
+        Point p = null;
+
+        if (playerPath.isEmpty())
+            p = apoLevel.getGoalXPoint();
+        else
+            p = playerPath.poll();
         // CALCULATE DIRECTION
         int diff = p.x - (int) apoPlayer.getX();
 
@@ -210,8 +271,6 @@ public class CheatAIGoalX implements Tickable, Initiationable {
             }
         }
     }
-
-    boolean funnyStuffActive = false;
 
 //    private BufferedImage originalChestImage;
     private BufferedImage replacedChestImage1;
