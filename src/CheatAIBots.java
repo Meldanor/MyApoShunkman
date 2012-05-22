@@ -10,7 +10,6 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import apoSkunkman.ApoSkunkmanConstants;
-import apoSkunkman.ai.ApoSkunkmanAIConstants;
 import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
@@ -81,29 +80,12 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     private void loadPics() throws Exception {
         TrollStoneEntity.setImage(ImageIO.read(new File(Meldanor.DIR, "ShallNotPass.png")));
-//
-//        // DEEP COPY OF STONE IMAGE
-//        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
-//        originalStoneImage = copyImage(level.getStoneImage());
 
         rageImage = ImageIO.read(new File(Meldanor.DIR, "Rage.png"));
         rageNuclearImage = ImageIO.read(new File(Meldanor.DIR, "RageNuclear.png"));
         rageOmegaImage = ImageIO.read(new File(Meldanor.DIR, "RageOmega.png"));
 
     }
-//    // ©http://www.java2s.com/Tutorial/Java/0261__2D-Graphics/Producesacopyofthesuppliedimage.htm
-//    private BufferedImage copyImage(BufferedImage image) {
-//        int w = image.getWidth();
-//        int h = image.getHeight();
-//        GraphicsConfiguration configuration = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-//        BufferedImage newImage = configuration.createCompatibleImage(w, h, Transparency.TRANSLUCENT);
-//        Graphics graphics = newImage.createGraphics();
-//
-//        graphics.drawImage(image, 0, 0, w, h, null);
-//
-//        graphics.dispose();
-//        return newImage;
-//    }
 
     // © http://alltheragefaces.com/img/faces/png/rage-rage.png
     private BufferedImage rageImage;
@@ -183,9 +165,6 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     private void handleLevel(long delta) {
         try {
-
-            setSpeed();
-
             resetPoints();
 
             if ((bombTimer -= delta) <= 0)
@@ -216,7 +195,6 @@ public class CheatAIBots implements Initiationable, Tickable {
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
         ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
 
-//        int bombRadius = RAND.nextInt(ApoSkunkmanConstants.PLAYER_WIDTH_MAX - ApoSkunkmanConstants.PLAYER_WIDTH_MIN) + ApoSkunkmanConstants.PLAYER_WIDTH_MIN;
         int bombRadius = 1;
         bombWidthField.set(player, bombRadius);
         level.layBomb(x, y, apoPlayer.getPlayer());
@@ -261,59 +239,4 @@ public class CheatAIBots implements Initiationable, Tickable {
             speed.set(enemyPlayer, 0.001f);
         }
     }
-
-    private void setSpeed() throws Exception {
-
-//        Field apoPlayerField = ApoSkunkmanAIPlayer.class.getDeclaredField("player");
-//        apoPlayerField.setAccessible(true);
-//        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
-//        Field speedField = ApoSkunkmanPlayer.class.getDeclaredField("speed");
-//        speedField.setAccessible(true);
-//
-//        speedField.set(player, randomFloat(0.001F, 1F));
-    }
-
-//    private float randomFloat(float pMin, float pMax) {
-//        return pMin + rand.nextFloat() * (pMax - pMin);
-//
-//    }
-
-//    private boolean right = false;
-//
-//    private void movePlayer() {
-//
-//        if (!right)
-//            apoPlayer.movePlayerRight();
-//        else
-//            apoPlayer.movePlayerLeft();
-//
-//        right = !right;
-//
-//    }
-//
-//    private boolean changeStoneImage = false;
-
-//    private BufferedImage originalStoneImage;
-
-//    private void changeStoneImage() throws Exception {
-//        BufferedImage newImage;
-//
-//        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
-//
-//        if (changeStoneImage)
-//            newImage = trollStoneImage;
-//        else
-//            newImage = originalStoneImage;
-//
-//        Graphics g = ApoSkunkmanImageContainer.iTile.getGraphics();
-//        g.drawImage(level.getGrasImage(), 1 * ApoSkunkmanConstants.TILE_SIZE, 0, null);
-//        g.drawImage(newImage, 1 * ApoSkunkmanConstants.TILE_SIZE, 0, null);
-//
-//        level.getGame().makeBackground(false, false, false, false);
-//
-//        changeStoneImage = !changeStoneImage;
-//    }
-
-//    BufferedImage iLevelTileStone = ApoSkunkmanImageContainer.iTile.getSubimage(1 * ApoSkunkmanConstants.TILE_SIZE, 0, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE);
-
 }
