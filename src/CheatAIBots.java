@@ -54,29 +54,21 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     private long time = System.currentTimeMillis();
 
-    private static final long TICK_TIMER = 10L;
-
     @Override
     public void tick(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
         if (isInit()) {
             this.apoLevel = apoLevel;
             this.apoPlayer = apoPlayer;
 
-            long diff = 0L;
-            diff = System.currentTimeMillis() - time;
-
-            // ONE TICK = 20 MS
-            if (diff > TICK_TIMER) {
-                handleLevel();
-                time = System.currentTimeMillis();
-            }
+            handleLevel(System.currentTimeMillis() - time);
+            time = System.currentTimeMillis();
 
         } else {
             init(apoPlayer, apoLevel);
         }
     }
 
-    private void handleLevel() {
+    private void handleLevel(long delta) {
         try {
             if (!disallowedBombs)
                 disallowBombs();

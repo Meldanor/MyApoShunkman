@@ -30,6 +30,8 @@ public class CheatAIGoalX implements Tickable, Initiationable {
     private ApoSkunkmanAIPlayer apoPlayer;
     private ApoSkunkmanAILevel apoLevel;
 
+    private final static Random RAND = new Random();
+
     // The field for the goal
     private Field goalPointField = null;
     // The field for the level
@@ -41,11 +43,6 @@ public class CheatAIGoalX implements Tickable, Initiationable {
 
     // 500 ms is tick
     private long time = System.currentTimeMillis();
-
-    private static final long TICK_TIMER = 500L;
-
-    // Maximum ticks to run away
-    private int runawayTicks = 30;
 
     @Override
     public boolean isInit() {
@@ -75,11 +72,13 @@ public class CheatAIGoalX implements Tickable, Initiationable {
 
             setStartPoints();
 
-            originalChestImage = ApoSkunkmanImageContainer.iGoalX;
+//            originalChestImage = ApoSkunkmanImageContainer.iGoalX;
 
             // © http://26.media.tumblr.com/avatar_af220d6da0cf_128.png
             replacedChestImage1 = ImageIO.read(new File(Meldanor.DIR, "YaoMing.png"));
             replacedChestImage2 = horiziontalFlip(replacedChestImage1);
+            // © http://alltheragefaces.com/img/faces/png/okay-okay-clean.png
+            finalChestImage = ImageIO.read(new File(Meldanor.DIR, "Okay.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -117,50 +116,47 @@ public class CheatAIGoalX implements Tickable, Initiationable {
     public void tick(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
 
         if (isInit()) {
-            long diff = 0L;
-            diff = System.currentTimeMillis() - time;
+            this.apoLevel = apoLevel;
+            this.apoPlayer = apoPlayer;
 
-            // ONE TICK = 500 MS
-            if (diff > TICK_TIMER) {
-                cheatGoalX();
-                time = System.currentTimeMillis();
-            }
+            handleLevel(System.currentTimeMillis() - time);
+            time = System.currentTimeMillis();
         } else
             init(apoPlayer, apoLevel);
     }
 
-    private void cheatGoalX() {
+    private long runawayTimer = 5000L;
+
+    private void handleLevel(long delta) {
         try {
-
-            changeChestImage();
-            // DO OR UNDO FUNNY THINGS
-            if (runawayTicks % 5 == 0) {
-                if (funnyStuffActive)
-                    undoFunnyStuff();
-                else
-                    doFunnyStuff();
-            }
-
             // MOVE THE GOAL UNTIL TIMER IS REACHED
-            if (runawayTicks-- > 0)
+            if ((runawayTimer -= delta) >= 0)
                 moveGoal();
 
+            // 500 ms BEFORE END PREPARE THE CHEST FOR CATCH
+            if (runawayTimer - 500 <= 0)
+                prepareChest();
+            else
+                // CHANGE THE IMAGE EVERY TICK
+                changeChestImage();
+
+            // MOVE THE PLAYER EVERY TICK
             movePlayer();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     private void setStartPoints() throws Exception {
 
         // Randomize start point for the goal
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
         Point goal = (Point) goalPointField.get(level);
 
-        Random rand = new Random();
         int width = apoLevel.getLevelAsByte().length - 3;
-        int x = rand.nextInt(width) + 1;
-        int y = rand.nextInt(width) + 1;
+        int x = RAND.nextInt(width) + 1;
+        int y = RAND.nextInt(width) + 1;
         goal.x = x;
         goal.y = y;
 
@@ -217,25 +213,26 @@ public class CheatAIGoalX implements Tickable, Initiationable {
 
     boolean funnyStuffActive = false;
 
-    private void doFunnyStuff() throws Exception {
-
-        funnyStuffActive = true;
-    }
-
-    private BufferedImage originalChestImage;
+//    private BufferedImage originalChestImage;
     private BufferedImage replacedChestImage1;
     private BufferedImage replacedChestImage2;
 
-    private void undoFunnyStuff() throws Exception {
-        
-        funnyStuffActive = false;
-    }
+    private boolean changeImage = false;
 
     private void changeChestImage() {
-        if (runawayTicks % 2 == 1)
+        if (changeImage)
             ApoSkunkmanImageContainer.iGoalX = replacedChestImage1;
         else
             ApoSkunkmanImageContainer.iGoalX = replacedChestImage2;
+
+        changeImage = !changeImage;
+    }
+
+    private BufferedImage finalChestImage;
+
+    private void prepareChest() {
+
+        ApoSkunkmanImageContainer.iGoalX = finalChestImage;
 
     }
 

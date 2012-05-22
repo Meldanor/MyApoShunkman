@@ -30,14 +30,22 @@ public class CheatAIHuman implements Tickable, Initiationable {
         return isInit;
     }
 
+    private long time = System.currentTimeMillis();
+
     @Override
     public void tick(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
         if (isInit) {
 
+            handleLevel(System.currentTimeMillis() - time);
+            time = System.currentTimeMillis();
         }
 
         else
             init(apoPlayer, apoLevel);
+
+    }
+
+    private void handleLevel(long delta) {
 
     }
 
