@@ -10,6 +10,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import apoSkunkman.ApoSkunkmanConstants;
+import apoSkunkman.ai.ApoSkunkmanAIConstants;
 import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
@@ -162,10 +163,20 @@ public class CheatAIBots implements Initiationable, Tickable {
     }
 
     private long bombTimer = 1000L;
+    private long bombWidthTimer = 2500L;
+    private long mercyTimer = 20000L;
 
     private void handleLevel(long delta) {
         try {
             resetPoints();
+
+            if (haveMercy && (mercyTimer -= delta) <= 0) {
+                haveMercy = false;
+                System.out.println("No more mercy!");
+            }
+
+            if ((bombWidthTimer -= delta) <= 0)
+                changeBombSize();
 
             if ((bombTimer -= delta) <= 0)
                 dropBomb();
@@ -177,30 +188,63 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     private Field bombWidthField;
 
+    private void changeBombSize() throws Exception {
+        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
+
+        int bombRadius = RAND.nextInt(ApoSkunkmanConstants.PLAYER_WIDTH_MAX - ApoSkunkmanConstants.PLAYER_WIDTH_MIN) + ApoSkunkmanConstants.PLAYER_WIDTH_MIN;
+        bombWidthField.set(player, bombRadius);
+        System.out.println("Run you fools! My bomb radius is now " + bombRadius);
+
+        // CHANGE BOMB WIDTH TIMER IS 5000-5500
+        bombWidthTimer = 5000L + RAND.nextInt(500);
+    }
+
+    // WHILE TRUE DON'T PLANT BOMBS NEAR BOTS
+    private boolean haveMercy = true;
+
     private void dropBomb() throws Exception {
 
         // FIND A BOMB POSITIOn WHICH IS NOT ON OR IN THE COVER
         int x = playerPosition.x;
         int y = playerPosition.y;
-        Point bombPoint = new Point(x, y);
+        Point bombPoint = null;
 
         // BOMB POSITION IS OUTSIDE IN THE COVER
-        while (bombPoint.distance(playerPosition) <= 1) {
-            // VALUES ARE BETWEEN 1 AND 14
+        do {
             x = RAND.nextInt(ApoSkunkmanConstants.LEVEL_WIDTH - 1) + 1;
             y = RAND.nextInt(ApoSkunkmanConstants.LEVEL_HEIGHT - 1) + 1;
             bombPoint = new Point(x, y);
-        }
+        } while (bombPoint.distance(playerPosition) <= 1 || !isFree(bombPoint) || !checkEnemies(bombPoint));
 
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
-        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
-
-        int bombRadius = 1;
-        bombWidthField.set(player, bombRadius);
         level.layBomb(x, y, apoPlayer.getPlayer());
 
         // BOMBTIMER IS BETWEEN 500 AND 1500
         bombTimer = 500 + RAND.nextInt(1000);
+    }
+
+    private boolean isFree(Point p) {
+        return apoLevel.getLevelAsByte()[p.y][p.x] == ApoSkunkmanAIConstants.LEVEL_FREE;
+    }
+
+    private static final double MERCY_DISTANCE = 2.0;
+
+    private boolean checkEnemies(Point bombPoint) {
+        // I DON'T HAVE ANY MERCY NOW!
+        if (!haveMercy)
+            return true;
+
+        double distance = 0.0;
+
+        // GET DISTANCE FROM ALL ENEMIES TO THE BOMB POINT
+        for (ApoSkunkmanAIEnemy enemy : apoLevel.getEnemies()) {
+            distance = bombPoint.distance(enemy.getX(), enemy.getY());
+            // IS IN MERCY DISTANCE :(
+            if (distance < MERCY_DISTANCE)
+                return false;
+        }
+
+        return true;
     }
 
     // EVERY BOT HAS maxSkunksman = 0
