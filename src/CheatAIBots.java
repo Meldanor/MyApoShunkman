@@ -214,17 +214,17 @@ public class CheatAIBots implements Initiationable, Tickable {
     private boolean enemiesSlowed = false;
 
     private void slowEnemies() throws Exception {
-        setEnemiesSpeed(ApoSkunkmanConstants.PLAYER_SPEED_MIN / 2);
+        setEnemiesSpeed(ApoSkunkmanConstants.PLAYER_SPEED_MIN / 16);
         enemiesSlowed = true;
         enableSlowTimer = 15000L + RAND.nextInt(5000);
-        System.out.println("You cannot flee!");
+        System.out.println("Freeze Mortals!");
     }
 
     private void disableSlowEnemies() throws Exception {
         setEnemiesSpeed(ApoSkunkmanConstants.PLAYER_SPEED_MIN);
         enemiesSlowed = false;
         disableSlowTimer = 5000L + RAND.nextInt(5000);
-        System.out.println("Run! But I will catch you!");
+        System.out.println("Just trolling...you can run");
     }
 
     private void setEnemiesSpeed(float speed) throws Exception {
@@ -272,7 +272,10 @@ public class CheatAIBots implements Initiationable, Tickable {
         level.layBomb(x, y, apoPlayer.getPlayer());
 
         // BOMBTIMER IS BETWEEN 500 AND 1500
-        bombTimer = 500 + RAND.nextInt(1000);
+        if (!isEnrage)
+            bombTimer = 500L + RAND.nextInt(1000);
+        else
+            bombTimer = 250L;
     }
 
     private boolean isFree(Point p) {
@@ -342,8 +345,8 @@ public class CheatAIBots implements Initiationable, Tickable {
 
         applyArmageddonStyle();
 
+        bombTimer = 250L;
         isEnrage = true;
-
     }
 
     private void applyArmageddonStyle() throws Exception {
