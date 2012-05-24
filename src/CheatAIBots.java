@@ -95,7 +95,7 @@ public class CheatAIBots implements Initiationable, Tickable {
     private BufferedImage rageOmegaImage;
 
     private void changePics() throws Exception {
-        List<BufferedImage> images = new ArrayList<>(3);
+        List<BufferedImage> images = new ArrayList<BufferedImage>(3);
         images.add(rageImage);
         images.add(rageNuclearImage);
         images.add(rageOmegaImage);
@@ -135,7 +135,7 @@ public class CheatAIBots implements Initiationable, Tickable {
         entityField[y][x - 1] = new TrollStoneEntity(x - 1, y);
 
         // UNSURE WHETHER THIS IS NEEDED
-         level.getGame().makeBackground(false, false, false, false);
+        level.getGame().makeBackground(false, false, false, false);
     }
 
     @Override
