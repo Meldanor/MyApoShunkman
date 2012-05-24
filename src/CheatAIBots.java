@@ -170,6 +170,8 @@ public class CheatAIBots implements Initiationable, Tickable {
     private long enableSlowTimer = 15000L;
     private long disableSlowTimer = 5000L;
 
+    private long enrageTimer = 60000L;
+
     private void handleLevel(long delta) {
         try {
             resetPoints();
@@ -192,6 +194,9 @@ public class CheatAIBots implements Initiationable, Tickable {
 
             if ((bombTimer -= delta) <= 0)
                 dropBomb();
+
+            if ((enrageTimer -= delta) <= 0)
+                goEnrage();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -311,6 +316,18 @@ public class CheatAIBots implements Initiationable, Tickable {
             enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
             enemyPlayer.setPoints(-1337);
         }
+    }
+
+    private boolean isEnrage = false;
+
+    // The bots have trolled us
+    // The bots have survived too long
+    // Now it is time to
+    // go
+    // ENRAGE!
+    // WAAAAAAAAGGGGGHHHHHHHHHHHHHHHHHH
+    private void goEnrage() {
+        isEnrage = true;
 
     }
 }
