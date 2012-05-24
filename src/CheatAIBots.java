@@ -10,12 +10,16 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import apoSkunkman.ApoSkunkmanConstants;
+import apoSkunkman.ApoSkunkmanImageContainer;
 import apoSkunkman.ai.ApoSkunkmanAIConstants;
 import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
+import apoSkunkman.entity.ApoSkunkmanBush;
 import apoSkunkman.entity.ApoSkunkmanEntity;
+import apoSkunkman.entity.ApoSkunkmanGoodie;
 import apoSkunkman.entity.ApoSkunkmanPlayer;
+import apoSkunkman.entity.ApoSkunkmanStone;
 import apoSkunkman.level.ApoSkunkmanLevel;
 
 /*
@@ -86,6 +90,8 @@ public class CheatAIBots implements Initiationable, Tickable {
         rageImage = ImageIO.read(new File(Meldanor.DIR, "Rage.png"));
         rageNuclearImage = ImageIO.read(new File(Meldanor.DIR, "RageNuclear.png"));
         rageOmegaImage = ImageIO.read(new File(Meldanor.DIR, "RageOmega.png"));
+
+        armageddonTiles = ImageIO.read(new File(Meldanor.DIR, "Armageddon.png"));
 
     }
 
@@ -195,7 +201,7 @@ public class CheatAIBots implements Initiationable, Tickable {
             if ((bombTimer -= delta) <= 0)
                 dropBomb();
 
-            if ((enrageTimer -= delta) <= 0)
+            if (!isEnrage && (enrageTimer -= delta) <= 0)
                 goEnrage();
 
         } catch (Exception e) {
@@ -320,14 +326,54 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     private boolean isEnrage = false;
 
+    // ©
+    // http://th06.deviantart.net/fs70/PRE/i/2011/047/1/2/lava_texture_stock_by_mavrosh_stock-d39o7zp.jpg
+    private BufferedImage armageddonTiles;
+
     // The bots have trolled us
     // The bots have survived too long
     // Now it is time to
     // go
     // ENRAGE!
     // WAAAAAAAAGGGGGHHHHHHHHHHHHHHHHHH
-    private void goEnrage() {
+    private void goEnrage() throws Exception {
+
+        System.out.println("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!");
+
+        applyArmageddonStyle();
+
         isEnrage = true;
+
+    }
+
+    private void applyArmageddonStyle() throws Exception {
+        ApoSkunkmanImageContainer.iTile = armageddonTiles;
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+
+        ApoSkunkmanEntity[][] entities = level.getLevel();
+        ApoSkunkmanEntity entity;
+        // REPLACE ALL IMAGES WITH THE ARMAGEDDON STYLE
+        // ALL BUSHES SPAWN BAD GOODIES
+        // DELETE EXISTING GOODIES
+        for (int y = 0; y < entities.length; ++y) {
+            for (int x = 0; x < entities[y].length; ++x) {
+                entity = entities[y][x];
+                if (entity != null) {
+                    if (entity instanceof ApoSkunkmanStone)
+                        entity.setIBackground(level.getStoneImage());
+                    else if (entity instanceof ApoSkunkmanBush) {
+                        entity.setIBackground(level.getBushImage());
+                        ApoSkunkmanBush bush = (ApoSkunkmanBush) entity;
+                        bush.setGoodie(ApoSkunkmanConstants.GOODIE_BAD_GOD);
+                    } else if (entity instanceof ApoSkunkmanGoodie) {
+                        entities[y][x] = null;
+                    }
+
+                }
+            }
+        }
+
+        level.getGame().makeBackground(false, false, false, false);
 
     }
 }
