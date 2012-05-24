@@ -42,7 +42,7 @@ public class CheatAIBots implements Initiationable, Tickable {
     private static final Random RAND = new Random();
 
     public CheatAIBots() {
-        System.out.println("Es geht gegen Bots!");
+        // EMPTY
     }
 
     @Override
@@ -62,13 +62,14 @@ public class CheatAIBots implements Initiationable, Tickable {
             bombWidthField = ApoSkunkmanPlayer.class.getDeclaredField("curWidth");
             bombWidthField.setAccessible(true);
 
+            enemySpeedField = ApoSkunkmanPlayer.class.getDeclaredField("speed");
+            enemySpeedField.setAccessible(true);
+
             loadPics();
 
             changePics();
 
             disallowBombs();
-
-            slowBots();
 
             setStartPosition();
 
@@ -166,9 +167,20 @@ public class CheatAIBots implements Initiationable, Tickable {
     private long bombWidthTimer = 2500L;
     private long mercyTimer = 20000L;
 
+    private long enableSlowTimer = 15000L;
+    private long disableSlowTimer = 5000L;
+
     private void handleLevel(long delta) {
         try {
             resetPoints();
+
+            if (enemiesSlowed) {
+                if ((disableSlowTimer -= delta) <= 0)
+                    disableSlowEnemies();
+            } else {
+                if ((enableSlowTimer -= delta) <= 0)
+                    slowEnemies();
+            }
 
             if (haveMercy && (mercyTimer -= delta) <= 0) {
                 haveMercy = false;
@@ -183,6 +195,35 @@ public class CheatAIBots implements Initiationable, Tickable {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private Field enemySpeedField = null;
+
+    private boolean enemiesSlowed = false;
+
+    private void slowEnemies() throws Exception {
+        setEnemiesSpeed(ApoSkunkmanConstants.PLAYER_SPEED_MIN / 2);
+        enemiesSlowed = true;
+        enableSlowTimer = 15000L + RAND.nextInt(5000);
+        System.out.println("You cannot flee!");
+    }
+
+    private void disableSlowEnemies() throws Exception {
+        setEnemiesSpeed(ApoSkunkmanConstants.PLAYER_SPEED_MIN);
+        enemiesSlowed = false;
+        disableSlowTimer = 5000L + RAND.nextInt(5000);
+        System.out.println("Run! But I will catch you!");
+    }
+
+    private void setEnemiesSpeed(float speed) throws Exception {
+
+        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
+        ApoSkunkmanPlayer enemyPlayer = null;
+
+        for (ApoSkunkmanAIEnemy enemy : enemies) {
+            enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
+            enemySpeedField.set(enemyPlayer, speed);
         }
     }
 
@@ -271,16 +312,5 @@ public class CheatAIBots implements Initiationable, Tickable {
             enemyPlayer.setPoints(-1337);
         }
 
-    }
-    private void slowBots() throws Exception {
-        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
-        ApoSkunkmanPlayer enemyPlayer = null;
-        Field speed = ApoSkunkmanPlayer.class.getDeclaredField("speed");
-        speed.setAccessible(true);
-
-        for (ApoSkunkmanAIEnemy enemy : enemies) {
-            enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
-            speed.set(enemyPlayer, 0.001f);
-        }
     }
 }
