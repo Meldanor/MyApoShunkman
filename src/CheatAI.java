@@ -41,12 +41,6 @@ public class CheatAI implements Tickable, Initiationable {
     @Override
     public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
         try {
-            if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X)
-                cheatAIHandler = new CheatAIGoalX();
-            else if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_STANDARD && areBots(apoLevel.getEnemies()))
-                cheatAIHandler = new CheatAIBots();
-            else
-                cheatAIHandler = new CheatAIHuman();
 
             // INIT FIELDS
             apoLevelField = ApoSkunkmanAILevel.class.getDeclaredField("level");
@@ -54,6 +48,16 @@ public class CheatAI implements Tickable, Initiationable {
 
             fireListField = ApoSkunkmanLevel.class.getDeclaredField("fire");
             fireListField.setAccessible(true);
+
+            if (isThereAnotherMeldanor(apoLevel.getEnemies())) {
+                displayMessage("Es kann nur einen Meldanor geben!", apoLevel);
+                cheatAIHandler = new CheatAIEpicBattle();
+            } else if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X)
+                cheatAIHandler = new CheatAIGoalX();
+            else if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_STANDARD && areBots(apoLevel.getEnemies()))
+                cheatAIHandler = new CheatAIBots();
+            else
+                cheatAIHandler = new CheatAIHuman();
 
             this.isInit = true;
         } catch (Exception e) {
@@ -86,6 +90,22 @@ public class CheatAI implements Tickable, Initiationable {
         return true;
     }
 
+    private boolean isThereAnotherMeldanor(ApoSkunkmanAIEnemy[] enemies) {
+        try {
+            Field enemyPlayerField = ApoSkunkmanAIEnemy.class.getDeclaredField("player");
+            enemyPlayerField.setAccessible(true);
+            String pName = null;
+            for (ApoSkunkmanAIEnemy apoSkunkmanAIEnemy : enemies) {
+                pName = ((ApoSkunkmanPlayer) enemyPlayerField.get(apoSkunkmanAIEnemy)).getAi().getPlayerName();
+                if (pName.equalsIgnoreCase("Meldanor"))
+                    return true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     @Override
     public boolean isInit() {
         return isInit;
