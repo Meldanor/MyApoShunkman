@@ -20,6 +20,7 @@ import apoSkunkman.entity.ApoSkunkmanEntity;
 import apoSkunkman.entity.ApoSkunkmanFire;
 import apoSkunkman.entity.ApoSkunkmanGoodie;
 import apoSkunkman.entity.ApoSkunkmanPlayer;
+import apoSkunkman.entity.ApoSkunkmanSkunkman;
 import apoSkunkman.entity.ApoSkunkmanStone;
 import apoSkunkman.level.ApoSkunkmanLevel;
 
@@ -67,6 +68,9 @@ public class CheatAIBots implements Initiationable, Tickable {
             bombWidthField = ApoSkunkmanPlayer.class.getDeclaredField("curWidth");
             bombWidthField.setAccessible(true);
 
+            maxBombsField = ApoSkunkmanPlayer.class.getDeclaredField("maxSkunkman");
+            maxBombsField.setAccessible(true);
+
             enemySpeedField = ApoSkunkmanPlayer.class.getDeclaredField("speed");
             enemySpeedField.setAccessible(true);
 
@@ -76,8 +80,6 @@ public class CheatAIBots implements Initiationable, Tickable {
             loadPics();
 
             changePics();
-
-            disallowBombs();
 
             setStartPosition();
 
@@ -95,7 +97,32 @@ public class CheatAIBots implements Initiationable, Tickable {
         rageNuclearImage = ImageIO.read(new File(Meldanor.DIR, "RageNuclear.png"));
         rageOmegaImage = ImageIO.read(new File(Meldanor.DIR, "RageOmega.png"));
 
-        armageddonTiles = ImageIO.read(new File(Meldanor.DIR, "Armageddon.png"));
+        armageddonTiles = ImageIO.read(new File(Meldanor.DIR, "Armageddon2.png"));
+
+        enemyArmageddonSkin = ImageIO.read(new File(Meldanor.DIR, "EnemyArmageddon.png"));
+        playerAmrageddonSkin = ImageIO.read(new File(Meldanor.DIR, "EnrageTroll.png"));
+
+        resetTiles();
+    }
+
+    private void resetTiles() throws Exception {
+        ApoSkunkmanImageContainer.iTile = ApoSkunkmanImageContainer.iTileAntje;
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+
+        ApoSkunkmanEntity[][] entities = level.getLevel();
+        ApoSkunkmanEntity entity;
+        for (int y = 0; y < entities.length; ++y) {
+            for (int x = 0; x < entities[y].length; ++x) {
+                entity = entities[y][x];
+                if (entity != null) {
+                    if (entity instanceof ApoSkunkmanStone)
+                        entity.setIBackground(level.getStoneImage());
+                    else if (entity instanceof ApoSkunkmanBush) {
+                        entity.setIBackground(level.getBushImage());
+                    }
+                }
+            }
+        }
 
     }
 
@@ -173,6 +200,7 @@ public class CheatAIBots implements Initiationable, Tickable {
         }
     }
 
+    // THE TIMERS' INITIAL VALUES
     private long bombTimer = 1000L;
     private long bombWidthTimer = 10000L;
     private long mercyTimer = 20000L;
@@ -182,18 +210,23 @@ public class CheatAIBots implements Initiationable, Tickable {
     private void handleLevel(long delta) {
         try {
             resetPoints();
+            // DON'T DO ANYTHING WHEN WE ARE PREPARING ARMAGEDDON
+            if (ragePhase == 0) {
+                // WHILE WE HAVE MERCY NO BOMBS ARE PLANTED NEAR THE BOTS
+                if (haveMercy && (mercyTimer -= delta) <= 0) {
+                    haveMercy = false;
+                    this.displayMessage("NO MORE MERCY!");
+                }
 
-            if (haveMercy && (mercyTimer -= delta) <= 0) {
-                haveMercy = false;
-                this.displayMessage("NO MORE MERCY!");
+                // CHANGE THE BOMB RADIUS
+                if ((bombWidthTimer -= delta) <= 0)
+                    changeBombSize();
+
+                // PLACE BOMB
+                if ((bombTimer -= delta) <= 0)
+                    dropBomb();
             }
-
-            if ((bombWidthTimer -= delta) <= 0)
-                changeBombSize();
-
-            if ((bombTimer -= delta) <= 0)
-                dropBomb();
-
+            // GOING ENRAGE
             if (!isEnrage && (enrageTimer -= delta) <= 0)
                 goEnrage();
 
@@ -202,10 +235,30 @@ public class CheatAIBots implements Initiationable, Tickable {
         }
     }
 
-    private Field enemySpeedField = null;
+    private Field fireListField;
+
+    @SuppressWarnings("unchecked")
+    private void displayMessage(String message) throws Exception {
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        ArrayList<ApoSkunkmanFire> fires = (ArrayList<ApoSkunkmanFire>) fireListField.get(level);
+
+        // DELETE OLD MESSAGES -> WE DISPLAY ONLY ONE MESSAGE AT ONE TIME
+        // THIS AVOIDS ARTEFACTS
+        for (int i = 0; i < fires.size(); ++i) {
+            if (fires.get(i) instanceof TrollMessageEntity) {
+                fires.get(i).setBVisible(false);
+                fires.remove(i);
+                break;
+            }
+        }
+        fires.add(new TrollMessageEntity(message));
+    }
+
+    private Field enemySpeedField;
 
     private void setEnemiesSpeed(float speed) throws Exception {
 
+        // GET ALL ENEMIES AND SET THE ADJUST THE MOVEMENTSPEED
         ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
         ApoSkunkmanPlayer enemyPlayer = null;
 
@@ -218,13 +271,16 @@ public class CheatAIBots implements Initiationable, Tickable {
     private Field bombWidthField;
 
     private void changeBombSize() throws Exception {
+        // GET OUR PLAYER BECAUSE WE DROP THE BOMB
         ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
 
+        // BOMB RADIUS = VALUE BETWEEN OR EQUALS 1 UNTIL 15
         int bombRadius = RAND.nextInt(ApoSkunkmanConstants.PLAYER_WIDTH_MAX - ApoSkunkmanConstants.PLAYER_WIDTH_MIN) + ApoSkunkmanConstants.PLAYER_WIDTH_MIN;
         bombWidthField.set(player, bombRadius);
-        displayMessage("Run you fools! My bomb radius is now " + bombRadius);
 
-        // CHANGE BOMB WIDTH TIMER IS 10000L-15000L
+        displayMessage("Have you heard? My bombs' radius is now " + bombRadius);
+
+        // BOMB TIMER = 10000L UNTIL 15000
         bombWidthTimer = 10000L + RAND.nextInt(5000);
     }
 
@@ -233,12 +289,13 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     private void dropBomb() throws Exception {
 
-        // FIND A BOMB POSITIOn WHICH IS NOT ON OR IN THE COVER
         int x = playerPosition.x;
         int y = playerPosition.y;
         Point bombPoint = null;
 
-        // BOMB POSITION IS OUTSIDE IN THE COVER
+        // SEARCH FOR A FREE BOMB SPOT
+        // WHICH CAN'T HIT US
+        // OR WHILE HAVING MERCY THE BOTS
         do {
             x = RAND.nextInt(ApoSkunkmanConstants.LEVEL_WIDTH - 1) + 1;
             y = RAND.nextInt(ApoSkunkmanConstants.LEVEL_HEIGHT - 1) + 1;
@@ -248,13 +305,15 @@ public class CheatAIBots implements Initiationable, Tickable {
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
         level.layBomb(x, y, apoPlayer.getPlayer());
 
-        // BOMBTIMER IS BETWEEN 500 AND 1500
+        // BOMBTIMER IS BETWEEN 500 AND 1500 IN NON ENRAGE MODE
         if (!isEnrage)
             bombTimer = 500L + RAND.nextInt(1000);
+        // BOMB TIMER IS NOW 250
         else
             bombTimer = 250L;
     }
 
+    // RETURNS TRUE WHEN ON THE FIELD IS NOTHING(NOR A GOODIE)
     private boolean isFree(Point p) {
         return apoLevel.getLevelAsByte()[p.y][p.x] == ApoSkunkmanAIConstants.LEVEL_FREE;
     }
@@ -279,21 +338,22 @@ public class CheatAIBots implements Initiationable, Tickable {
         return true;
     }
 
-    // EVERY BOT HAS maxSkunksman = 0
-    public void disallowBombs() throws Exception {
-//        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
-//        ApoSkunkmanPlayer enemyPlayer = null;
-//        Field maxBombsField = ApoSkunkmanPlayer.class.getDeclaredField("maxSkunkman");
-//        maxBombsField.setAccessible(true);
-//
-//        for (ApoSkunkmanAIEnemy enemy : enemies) {
-//            enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
-//            maxBombsField.set(enemyPlayer, 0);
-//        }
+    private Field maxBombsField = null;
+
+    // SET THE MAXIMUM COUNT OF BOMBS THE BOTS ARE ALLOWED TO LAY
+    public void setBotsMaxBombs(int bombCount) throws Exception {
+
+        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
+        ApoSkunkmanPlayer enemyPlayer = null;
+
+        for (ApoSkunkmanAIEnemy enemy : enemies) {
+            enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
+            maxBombsField.set(enemyPlayer, bombCount);
+        }
 
     }
 
-    // Every Enemy has only -1337 Points - To Bad for them
+    // EVERY ENEMY HAS ONLY -1337 POINTS
     private void resetPoints() throws Exception {
         ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
         ApoSkunkmanPlayer enemyPlayer = null;
@@ -306,48 +366,66 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     private boolean isEnrage = false;
 
-    // ©
-    // http://th06.deviantart.net/fs70/PRE/i/2011/047/1/2/lava_texture_stock_by_mavrosh_stock-d39o7zp.jpg
+    // ENTER THE ENRAGE MODE IN 4 STEPS
+    private int ragePhase = 0;
+
+    // ©http://th06.deviantart.net/fs70/PRE/i/2011/047/1/2/lava_texture_stock_by_mavrosh_stock-d39o7zp.jpg
     private BufferedImage armageddonTiles;
 
-    // The bots have trolled us
-    // The bots have survived too long
-    // Now it is time to
-    // go
-    // ENRAGE!
-    // WAAAAAAAAGGGGGHHHHHHHHHHHHHHHHHH
     private void goEnrage() throws Exception {
 
-        displayMessage("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!");
+        // CHANGE LEVEL STYLE
+        changeArmageddonStyle();
 
-        applyArmageddonStyle();
+        // WE HAVE JUST ENTERED THE ENRAGE
+        // PREPARE EVERYTHING
+        if (ragePhase == 0) {
+            // BOTS CAN'T SET ANYTHING
+            setBotsMaxBombs(0);
+            // BOTS CAN'T MOVE
+            setEnemiesSpeed(0.0F);
+            // REMOVE SKUNKMANS AND GOODIES AND REPLACE ENEMIES SKINS
+            prepareArmageddon();
+            displayMessage("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!");
+        }
 
-        setEnemiesSpeed(0);
+        // FINISHED THE TRANSFORMATION
+        if (ragePhase == 3) {
+            // BOTS ARE ALLOWED TO MOVE NOW
+            setEnemiesSpeed(ApoSkunkmanConstants.PLAYER_SPEED_MIN);
+            // BOTS CAN PLACE BOMBS
+            setBotsMaxBombs(1);
+            isEnrage = true;
+            // AFTER THIS RAGESTAGE == 0
+            ragePhase = -1;
+        }
 
-        bombTimer = 250L;
-        isEnrage = true;
+        // TIME UNTIL NEXT RAGE STEP
+        enrageTimer = 1000L;
+        ++ragePhase;
     }
 
-    private void applyArmageddonStyle() throws Exception {
-        ApoSkunkmanImageContainer.iTile = armageddonTiles;
+    // © http://alltheragefaces.com/img/faces/png/sad-numb.png
+    private BufferedImage enemyArmageddonSkin;
+    private BufferedImage playerAmrageddonSkin;
+
+    private void prepareArmageddon() throws Exception {
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
 
         ApoSkunkmanEntity[][] entities = level.getLevel();
         ApoSkunkmanEntity entity;
-        // REPLACE ALL IMAGES WITH THE ARMAGEDDON STYLE
+
         // ALL BUSHES SPAWN BAD GOODIES
         // DELETE EXISTING GOODIES
+        // DELETE EXISTING SKUNKMAN
         for (int y = 0; y < entities.length; ++y) {
             for (int x = 0; x < entities[y].length; ++x) {
                 entity = entities[y][x];
                 if (entity != null) {
-                    if (entity instanceof ApoSkunkmanStone)
-                        entity.setIBackground(level.getStoneImage());
-                    else if (entity instanceof ApoSkunkmanBush) {
-                        entity.setIBackground(level.getBushImage());
+                    if (entity instanceof ApoSkunkmanBush) {
                         ApoSkunkmanBush bush = (ApoSkunkmanBush) entity;
                         bush.setGoodie(ApoSkunkmanConstants.GOODIE_BAD_GOD);
-                    } else if (entity instanceof ApoSkunkmanGoodie) {
+                    } else if (entity instanceof ApoSkunkmanGoodie || entity instanceof ApoSkunkmanSkunkman) {
                         entities[y][x] = null;
                     }
 
@@ -355,18 +433,39 @@ public class CheatAIBots implements Initiationable, Tickable {
             }
         }
 
-        level.getGame().makeBackground(false, false, false, false);
+        // CHANGE ENEMIES SKIN
+        for (ApoSkunkmanAIEnemy enemyAI : apoLevel.getEnemies()) {
+            ApoSkunkmanPlayer enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemyAI);
+            enemyPlayer.setIBackground(enemyArmageddonSkin);
+        }
+
+        // CHANGE PLAYER SKIN
+        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
+        player.setIBackground(playerAmrageddonSkin);
 
     }
 
-    private Field fireListField;
-
-    @SuppressWarnings("unchecked")
-    private void displayMessage(String message) throws Exception {
-//        System.out.println("Nachricht" + message);
+    private void changeArmageddonStyle() throws Exception {
+        BufferedImage bImage = armageddonTiles.getSubimage(0, ApoSkunkmanConstants.TILE_SIZE * ragePhase, armageddonTiles.getWidth(), ApoSkunkmanConstants.TILE_SIZE);
+        ApoSkunkmanImageContainer.iTile = bImage;
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
-        ArrayList<ApoSkunkmanFire> fires = (ArrayList<ApoSkunkmanFire>) fireListField.get(level);
-        fires.add(new TrollMessageEntity(message));
 
+        ApoSkunkmanEntity[][] entities = level.getLevel();
+        ApoSkunkmanEntity entity;
+        // REPLACE ALL IMAGES WITH THE ARMAGEDDON STYLE
+        for (int y = 0; y < entities.length; ++y) {
+            for (int x = 0; x < entities[y].length; ++x) {
+                entity = entities[y][x];
+                if (entity != null) {
+                    if (entity instanceof ApoSkunkmanStone)
+                        entity.setIBackground(level.getStoneImage());
+                    else if (entity instanceof ApoSkunkmanBush)
+                        entity.setIBackground(level.getBushImage());
+
+                }
+            }
+        }
+
+        level.getGame().makeBackground(false, false, false, false);
     }
 }

@@ -27,7 +27,6 @@ public class TrollMessageEntity extends ApoSkunkmanFire {
     public TrollMessageEntity(String message) {
         super(new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB), (ApoSkunkmanConstants.LEVEL_WIDTH / 2) * ApoSkunkmanConstants.TILE_SIZE, (ApoSkunkmanConstants.LEVEL_HEIGHT / 2) * ApoSkunkmanConstants.TILE_SIZE, 1, 1);
         this.message = message;
-        System.out.println(isBVisible());
     }
 
     @Override
