@@ -1,4 +1,5 @@
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import Stinker.StinkerMain;
 import apoSkunkman.ai.ApoSkunkmanAI;
@@ -8,7 +9,9 @@ import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 import apoSkunkman.ai.ai.ApoAILeftRight;
 import apoSkunkman.ai.ai.ApoAIRunner;
+import apoSkunkman.entity.ApoSkunkmanFire;
 import apoSkunkman.entity.ApoSkunkmanPlayer;
+import apoSkunkman.level.ApoSkunkmanLevel;
 
 /*
  * Copyright (C) 2012 Kilian Gaertner
@@ -37,13 +40,25 @@ public class CheatAI implements Tickable, Initiationable {
 
     @Override
     public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
-        if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X)
-            cheatAIHandler = new CheatAIGoalX();
-        else if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_STANDARD && areBots(apoLevel.getEnemies()))
-            cheatAIHandler = new CheatAIBots();
-        else
-            cheatAIHandler = new CheatAIHuman();
-        this.isInit = true;
+        try {
+            if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X)
+                cheatAIHandler = new CheatAIGoalX();
+            else if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_STANDARD && areBots(apoLevel.getEnemies()))
+                cheatAIHandler = new CheatAIBots();
+            else
+                cheatAIHandler = new CheatAIHuman();
+
+            // INIT FIELDS
+            apoLevelField = ApoSkunkmanAILevel.class.getDeclaredField("level");
+            apoLevelField.setAccessible(true);
+
+            fireListField = ApoSkunkmanLevel.class.getDeclaredField("fire");
+            fireListField.setAccessible(true);
+
+            this.isInit = true;
+        } catch (Exception e) {
+
+        }
 
     }
 
@@ -74,6 +89,26 @@ public class CheatAI implements Tickable, Initiationable {
     @Override
     public boolean isInit() {
         return isInit;
+    }
+
+    private static Field fireListField;
+    private static Field apoLevelField;
+
+    @SuppressWarnings("unchecked")
+    public static void displayMessage(String message, ApoSkunkmanAILevel apoLevel) throws Exception {
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        ArrayList<ApoSkunkmanFire> fires = (ArrayList<ApoSkunkmanFire>) fireListField.get(level);
+
+        // DELETE OLD MESSAGES -> WE DISPLAY ONLY ONE MESSAGE AT ONE TIME
+        // THIS AVOIDS ARTEFACTS
+        for (int i = 0; i < fires.size(); ++i) {
+            if (fires.get(i) instanceof TrollMessageEntity) {
+                fires.get(i).setBVisible(false);
+                fires.remove(i);
+                break;
+            }
+        }
+        fires.add(new TrollMessageEntity(message));
     }
 
 }

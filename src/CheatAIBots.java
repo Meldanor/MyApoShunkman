@@ -17,7 +17,6 @@ import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 import apoSkunkman.entity.ApoSkunkmanBush;
 import apoSkunkman.entity.ApoSkunkmanEntity;
-import apoSkunkman.entity.ApoSkunkmanFire;
 import apoSkunkman.entity.ApoSkunkmanGoodie;
 import apoSkunkman.entity.ApoSkunkmanPlayer;
 import apoSkunkman.entity.ApoSkunkmanSkunkman;
@@ -42,8 +41,8 @@ public class CheatAIBots implements Initiationable, Tickable {
     private ApoSkunkmanAIPlayer apoPlayer;
 
     private Field apoPlayerField;
-    private Field enemyPlayerField = null;
-    private Field apoLevelField = null;
+    private Field enemyPlayerField;
+    private Field apoLevelField;
 
     private static final Random RAND = new Random();
 
@@ -73,9 +72,6 @@ public class CheatAIBots implements Initiationable, Tickable {
 
             enemySpeedField = ApoSkunkmanPlayer.class.getDeclaredField("speed");
             enemySpeedField.setAccessible(true);
-
-            fireListField = ApoSkunkmanLevel.class.getDeclaredField("fire");
-            fireListField.setAccessible(true);
 
             loadPics();
 
@@ -222,7 +218,7 @@ public class CheatAIBots implements Initiationable, Tickable {
                 // WHILE WE HAVE MERCY NO BOMBS ARE PLANTED NEAR THE BOTS
                 if (haveMercy && (mercyTimer -= delta) <= 0) {
                     haveMercy = false;
-                    this.displayMessage("NO MORE MERCY!");
+                    CheatAI.displayMessage("NO MORE MERCY!", apoLevel);
                 }
 
                 // CHANGE THE BOMB RADIUS
@@ -240,25 +236,6 @@ public class CheatAIBots implements Initiationable, Tickable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private Field fireListField;
-
-    @SuppressWarnings("unchecked")
-    private void displayMessage(String message) throws Exception {
-        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
-        ArrayList<ApoSkunkmanFire> fires = (ArrayList<ApoSkunkmanFire>) fireListField.get(level);
-
-        // DELETE OLD MESSAGES -> WE DISPLAY ONLY ONE MESSAGE AT ONE TIME
-        // THIS AVOIDS ARTEFACTS
-        for (int i = 0; i < fires.size(); ++i) {
-            if (fires.get(i) instanceof TrollMessageEntity) {
-                fires.get(i).setBVisible(false);
-                fires.remove(i);
-                break;
-            }
-        }
-        fires.add(new TrollMessageEntity(message));
     }
 
     private Field enemySpeedField;
@@ -285,7 +262,7 @@ public class CheatAIBots implements Initiationable, Tickable {
         int bombRadius = RAND.nextInt(ApoSkunkmanConstants.PLAYER_WIDTH_MAX - ApoSkunkmanConstants.PLAYER_WIDTH_MIN) + ApoSkunkmanConstants.PLAYER_WIDTH_MIN;
         bombWidthField.set(player, bombRadius);
 
-        displayMessage("Have you heard? My bombs' radius is now " + bombRadius);
+        CheatAI.displayMessage("Have you heard? My bombs' radius is now " + bombRadius, apoLevel);
 
         // BOMB TIMER = 10000L UNTIL 12500
         bombWidthTimer = 10000L + RAND.nextInt(2500);
@@ -393,7 +370,7 @@ public class CheatAIBots implements Initiationable, Tickable {
             setEnemiesSpeed(0.0F);
             // REMOVE SKUNKMANS AND GOODIES AND REPLACE ENEMIES SKINS
             prepareArmageddon();
-            displayMessage("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!");
+            CheatAI.displayMessage("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!", apoLevel);
         }
 
         // FINISHED THE TRANSFORMATION
