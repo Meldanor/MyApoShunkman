@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 
 import apoSkunkman.ApoSkunkmanConstants;
 import apoSkunkman.ApoSkunkmanImageContainer;
+import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 import apoSkunkman.entity.ApoSkunkmanEntity;
@@ -43,7 +44,6 @@ public class CheatAIGoalX implements Tickable, Initiationable {
 
     private boolean isInit = false;
 
-    // 500 ms is tick
     private long time = System.currentTimeMillis();
 
     @Override
@@ -57,36 +57,51 @@ public class CheatAIGoalX implements Tickable, Initiationable {
         this.apoPlayer = apoPlayer;
         try {
 
-            Class<? extends ApoSkunkmanAILevel> apoLevelClass = apoLevel.getClass();
+            initFields();
 
-            // THE LEVEL
-            apoLevelField = apoLevelClass.getDeclaredField("level");
-            apoLevelField.setAccessible(true);
+            loadImages();
 
-            // THE GOAL
-            goalPointField = ApoSkunkmanLevel.class.getDeclaredField("goalX");
-            goalPointField.setAccessible(true);
-
-            // THE PLAYER
-            apoPlayerField = apoPlayer.getClass().getDeclaredField("player");
-            apoPlayerField.setAccessible(true);
             clearField();
 
             setStartPoints();
+
             generateGoalPath();
 
-//            originalChestImage = ApoSkunkmanImageContainer.iGoalX;
-
-            // © http://26.media.tumblr.com/avatar_af220d6da0cf_128.png
-            replacedChestImage1 = ImageIO.read(new File(Meldanor.DIR, "YaoMing.png"));
-            replacedChestImage2 = horiziontalFlip(replacedChestImage1);
-            // © http://alltheragefaces.com/img/faces/png/okay-okay-clean.png
-            finalChestImage = ImageIO.read(new File(Meldanor.DIR, "Okay.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         isInit = true;
+
+    }
+
+    private void initFields() throws Exception {
+        // THE LEVEL
+        apoLevelField = ApoSkunkmanAILevel.class.getDeclaredField("level");
+        apoLevelField.setAccessible(true);
+
+        // THE GOAL
+        goalPointField = ApoSkunkmanLevel.class.getDeclaredField("goalX");
+        goalPointField.setAccessible(true);
+
+        // THE PLAYER
+        apoPlayerField = ApoSkunkmanAIPlayer.class.getDeclaredField("player");
+        apoPlayerField.setAccessible(true);
+
+        enemyPlayerField = ApoSkunkmanAIEnemy.class.getDeclaredField("player");
+        enemyPlayerField.setAccessible(true);
+
+        enemySpeedField = ApoSkunkmanPlayer.class.getDeclaredField("speed");
+        enemySpeedField.setAccessible(true);
+
+    }
+
+    private void loadImages() throws Exception {
+        // © http://26.media.tumblr.com/avatar_af220d6da0cf_128.png
+        replacedChestImage1 = ImageIO.read(new File(Meldanor.DIR, "YaoMing.png"));
+        replacedChestImage2 = horiziontalFlip(replacedChestImage1);
+        // © http://alltheragefaces.com/img/faces/png/okay-okay-clean.png
+        finalChestImage = ImageIO.read(new File(Meldanor.DIR, "Okay.png"));
 
     }
 
@@ -115,38 +130,6 @@ public class CheatAIGoalX implements Tickable, Initiationable {
         level.getGame().makeBackground(false, false, false, false);
     }
 
-    @Override
-    public void tick(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
-
-        if (isInit()) {
-            this.apoLevel = apoLevel;
-            this.apoPlayer = apoPlayer;
-
-            handleLevel(System.currentTimeMillis() - time);
-            time = System.currentTimeMillis();
-        } else
-            init(apoPlayer, apoLevel);
-    }
-
-    private void handleLevel(long delta) {
-        try {
-            // MOVE THE GOAL UNTIL TIMER IS REACHED
-            moveGoal();
-
-            // 500 ms BEFORE END PREPARE THE CHEST FOR CATCH
-            if (goalPath.size() <= 1)
-                prepareChest();
-            else
-                // CHANGE THE IMAGE EVERY TICK
-                changeChestImage();
-
-            // MOVE THE PLAYER EVERY TICK
-            movePlayer();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     private void setStartPoints() throws Exception {
 
         // Randomize start point for the goal
@@ -156,13 +139,33 @@ public class CheatAIGoalX implements Tickable, Initiationable {
         // GOAL START IN THE MIDDLE OF THE FIELD
         goal.x = (int) (ApoSkunkmanConstants.LEVEL_WIDTH / 2);
         goal.y = (int) (ApoSkunkmanConstants.LEVEL_HEIGHT / 2);
-        // now calculate the players start position
 
         ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
 
         // PLAYER ALWAYS START ON THE LEFT SIDE OF THE GOAL
         player.setX((goal.x - 1) * ApoSkunkmanConstants.TILE_SIZE);
         player.setY(goal.y * ApoSkunkmanConstants.TILE_SIZE);
+
+        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
+        if (enemies.length != 0)
+            destroyEnemies(enemies);
+
+    }
+
+    private Field enemyPlayerField;
+    private Field enemySpeedField;
+
+    private void destroyEnemies(ApoSkunkmanAIEnemy[] enemies) throws Exception {
+
+        CheatAI.displayMessage("Du nicht nehmen Kerze!", apoLevel);
+
+        ApoSkunkmanPlayer enemyPlayer = null;
+        for (ApoSkunkmanAIEnemy enemy : enemies) {
+            enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
+            enemyPlayer.setX(0);
+            enemyPlayer.setY(0);
+            enemySpeedField.set(enemyPlayer, 0.0F);
+        }
     }
 
     private void generateGoalPath() throws Exception {
@@ -171,7 +174,6 @@ public class CheatAIGoalX implements Tickable, Initiationable {
         int curX = goal.x;
         int curY = goal.y;
 
-//        int pathSize = RAND.nextInt(40) + 10;
         int pathSize = 500;
         LinkedList<Point> pathList = new LinkedList<Point>();
 
@@ -208,7 +210,6 @@ public class CheatAIGoalX implements Tickable, Initiationable {
                 else
                     break in;
             }
-            System.out.println(pathList.size());
             if (tempP == pathList.size()) {
                 if (b) {
                     break;
@@ -225,8 +226,37 @@ public class CheatAIGoalX implements Tickable, Initiationable {
         playerPath.addAll(pathList);
 
     }
+
     private boolean isInside(int x, int y) {
         return x >= 1 && y >= 1 && x < ApoSkunkmanConstants.LEVEL_WIDTH - 1 && y < ApoSkunkmanConstants.LEVEL_HEIGHT - 1;
+    }
+
+    @Override
+    public void tick(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
+        this.apoLevel = apoLevel;
+        this.apoPlayer = apoPlayer;
+
+        if (isInit()) {
+            handleLevel(System.currentTimeMillis() - time);
+            time = System.currentTimeMillis();
+        } else
+            init(apoPlayer, apoLevel);
+    }
+
+    private void handleLevel(long delta) {
+        try {
+            moveGoal();
+
+            if (goalPath.size() <= 1)
+                prepareChest();
+            else
+                changeChestImage();
+
+            movePlayer();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Queue<Point> goalPath;
@@ -271,7 +301,6 @@ public class CheatAIGoalX implements Tickable, Initiationable {
         }
     }
 
-//    private BufferedImage originalChestImage;
     private BufferedImage replacedChestImage1;
     private BufferedImage replacedChestImage2;
 
@@ -289,9 +318,7 @@ public class CheatAIGoalX implements Tickable, Initiationable {
     private BufferedImage finalChestImage;
 
     private void prepareChest() {
-
         ApoSkunkmanImageContainer.iGoalX = finalChestImage;
-
     }
 
 }
