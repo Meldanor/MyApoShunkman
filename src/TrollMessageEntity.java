@@ -15,7 +15,6 @@ import apoSkunkman.entity.ApoSkunkmanFire;
  * des Copyrights eine Pizza spendieren, sollte derjenige dem Inhabenden des Copyrights
  * begegnen.
  */
-
 public class TrollMessageEntity extends ApoSkunkmanFire {
 
     private final String message;

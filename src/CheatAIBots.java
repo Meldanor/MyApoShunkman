@@ -203,9 +203,9 @@ public class CheatAIBots implements Initiationable, Tickable {
     // THE TIMERS' INITIAL VALUES
     private long bombTimer = 1000L;
     private long bombWidthTimer = 10000L;
-    private long mercyTimer = 20000L;
+    private long mercyTimer = 15000L;
 
-    private long enrageTimer = 60000L;
+    private long enrageTimer = 35000L;
 
     private void handleLevel(long delta) {
         try {
@@ -280,8 +280,8 @@ public class CheatAIBots implements Initiationable, Tickable {
 
         displayMessage("Have you heard? My bombs' radius is now " + bombRadius);
 
-        // BOMB TIMER = 10000L UNTIL 15000
-        bombWidthTimer = 10000L + RAND.nextInt(5000);
+        // BOMB TIMER = 10000L UNTIL 12500
+        bombWidthTimer = 10000L + RAND.nextInt(2500);
     }
 
     // WHILE TRUE DON'T PLANT BOMBS NEAR BOTS
