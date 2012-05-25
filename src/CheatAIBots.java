@@ -17,6 +17,7 @@ import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 import apoSkunkman.entity.ApoSkunkmanBush;
 import apoSkunkman.entity.ApoSkunkmanEntity;
+import apoSkunkman.entity.ApoSkunkmanFire;
 import apoSkunkman.entity.ApoSkunkmanGoodie;
 import apoSkunkman.entity.ApoSkunkmanPlayer;
 import apoSkunkman.entity.ApoSkunkmanStone;
@@ -68,6 +69,9 @@ public class CheatAIBots implements Initiationable, Tickable {
 
             enemySpeedField = ApoSkunkmanPlayer.class.getDeclaredField("speed");
             enemySpeedField.setAccessible(true);
+
+            fireListField = ApoSkunkmanLevel.class.getDeclaredField("fire");
+            fireListField.setAccessible(true);
 
             loadPics();
 
@@ -170,11 +174,8 @@ public class CheatAIBots implements Initiationable, Tickable {
     }
 
     private long bombTimer = 1000L;
-    private long bombWidthTimer = 2500L;
+    private long bombWidthTimer = 10000L;
     private long mercyTimer = 20000L;
-
-    private long enableSlowTimer = 15000L;
-    private long disableSlowTimer = 5000L;
 
     private long enrageTimer = 60000L;
 
@@ -182,17 +183,9 @@ public class CheatAIBots implements Initiationable, Tickable {
         try {
             resetPoints();
 
-            if (enemiesSlowed) {
-                if ((disableSlowTimer -= delta) <= 0)
-                    disableSlowEnemies();
-            } else {
-                if ((enableSlowTimer -= delta) <= 0)
-                    slowEnemies();
-            }
-
             if (haveMercy && (mercyTimer -= delta) <= 0) {
                 haveMercy = false;
-                System.out.println("No more mercy!");
+                this.displayMessage("NO MORE MERCY!");
             }
 
             if ((bombWidthTimer -= delta) <= 0)
@@ -210,22 +203,6 @@ public class CheatAIBots implements Initiationable, Tickable {
     }
 
     private Field enemySpeedField = null;
-
-    private boolean enemiesSlowed = false;
-
-    private void slowEnemies() throws Exception {
-        setEnemiesSpeed(ApoSkunkmanConstants.PLAYER_SPEED_MIN / 16);
-        enemiesSlowed = true;
-        enableSlowTimer = 15000L + RAND.nextInt(5000);
-        System.out.println("Freeze Mortals!");
-    }
-
-    private void disableSlowEnemies() throws Exception {
-        setEnemiesSpeed(ApoSkunkmanConstants.PLAYER_SPEED_MIN);
-        enemiesSlowed = false;
-        disableSlowTimer = 5000L + RAND.nextInt(5000);
-        System.out.println("Just trolling...you can run");
-    }
 
     private void setEnemiesSpeed(float speed) throws Exception {
 
@@ -245,10 +222,10 @@ public class CheatAIBots implements Initiationable, Tickable {
 
         int bombRadius = RAND.nextInt(ApoSkunkmanConstants.PLAYER_WIDTH_MAX - ApoSkunkmanConstants.PLAYER_WIDTH_MIN) + ApoSkunkmanConstants.PLAYER_WIDTH_MIN;
         bombWidthField.set(player, bombRadius);
-        System.out.println("Run you fools! My bomb radius is now " + bombRadius);
+        displayMessage("Run you fools! My bomb radius is now " + bombRadius);
 
-        // CHANGE BOMB WIDTH TIMER IS 5000-5500
-        bombWidthTimer = 5000L + RAND.nextInt(500);
+        // CHANGE BOMB WIDTH TIMER IS 10000L-15000L
+        bombWidthTimer = 10000L + RAND.nextInt(5000);
     }
 
     // WHILE TRUE DON'T PLANT BOMBS NEAR BOTS
@@ -304,15 +281,15 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     // EVERY BOT HAS maxSkunksman = 0
     public void disallowBombs() throws Exception {
-        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
-        ApoSkunkmanPlayer enemyPlayer = null;
-        Field maxBombsField = ApoSkunkmanPlayer.class.getDeclaredField("maxSkunkman");
-        maxBombsField.setAccessible(true);
-
-        for (ApoSkunkmanAIEnemy enemy : enemies) {
-            enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
-            maxBombsField.set(enemyPlayer, 0);
-        }
+//        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
+//        ApoSkunkmanPlayer enemyPlayer = null;
+//        Field maxBombsField = ApoSkunkmanPlayer.class.getDeclaredField("maxSkunkman");
+//        maxBombsField.setAccessible(true);
+//
+//        for (ApoSkunkmanAIEnemy enemy : enemies) {
+//            enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
+//            maxBombsField.set(enemyPlayer, 0);
+//        }
 
     }
 
@@ -341,9 +318,11 @@ public class CheatAIBots implements Initiationable, Tickable {
     // WAAAAAAAAGGGGGHHHHHHHHHHHHHHHHHH
     private void goEnrage() throws Exception {
 
-        System.out.println("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!");
+        displayMessage("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!");
 
         applyArmageddonStyle();
+
+        setEnemiesSpeed(0);
 
         bombTimer = 250L;
         isEnrage = true;
@@ -377,6 +356,17 @@ public class CheatAIBots implements Initiationable, Tickable {
         }
 
         level.getGame().makeBackground(false, false, false, false);
+
+    }
+
+    private Field fireListField;
+
+    @SuppressWarnings("unchecked")
+    private void displayMessage(String message) throws Exception {
+//        System.out.println("Nachricht" + message);
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        ArrayList<ApoSkunkmanFire> fires = (ArrayList<ApoSkunkmanFire>) fireListField.get(level);
+        fires.add(new TrollMessageEntity(message));
 
     }
 }
