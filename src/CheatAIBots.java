@@ -79,6 +79,8 @@ public class CheatAIBots implements Initiationable, Tickable {
 
             loadPics();
 
+            TrollBombEntity.init(preBombEffect, apoPlayer.getPlayer());
+
             changePics();
 
             setStartPosition();
@@ -90,8 +92,13 @@ public class CheatAIBots implements Initiationable, Tickable {
 
     }
 
+    // © http://img834.imageshack.us/img834/1918/textest.jpg
+    private BufferedImage preBombEffect;
+
     private void loadPics() throws Exception {
         TrollStoneEntity.setImage(ImageIO.read(new File(Meldanor.DIR, "ShallNotPass.png")));
+
+        preBombEffect = ImageIO.read(new File(Meldanor.DIR, "BombEffect.png"));
 
         rageImage = ImageIO.read(new File(Meldanor.DIR, "Rage.png"));
         rageNuclearImage = ImageIO.read(new File(Meldanor.DIR, "RageNuclear.png"));
@@ -303,7 +310,7 @@ public class CheatAIBots implements Initiationable, Tickable {
         } while (bombPoint.distance(playerPosition) <= 1 || !isFree(bombPoint) || !checkEnemies(bombPoint));
 
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
-        level.layBomb(x, y, apoPlayer.getPlayer());
+        level.getLevel()[y][x] = new TrollBombEntity(x, y, level);
 
         // BOMBTIMER IS BETWEEN 500 AND 1500 IN NON ENRAGE MODE
         if (!isEnrage)
