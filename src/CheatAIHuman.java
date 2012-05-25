@@ -1,5 +1,13 @@
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.lang.reflect.Field;
+
+import javax.imageio.ImageIO;
+
+import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
+import apoSkunkman.entity.ApoSkunkmanPlayer;
 
 /*
  * Copyright (C) 2012 Kilian Gaertner
@@ -15,6 +23,13 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
     private boolean isInit = false;
 
+    private ApoSkunkmanAILevel apoLevel;
+    private ApoSkunkmanAIPlayer apoPlayer;
+
+    private Field apoPlayerField;
+    private Field enemyPlayerField;
+    private Field apoLevelField;
+
     public CheatAIHuman() {
         System.out.println("Wir helfen nun den Spielern!");
     }
@@ -22,8 +37,44 @@ public class CheatAIHuman implements Tickable, Initiationable {
     @Override
     public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
 
-        isInit = true;
+        try {
 
+            getFields();
+
+            loadPics();
+
+            changePlayerPic(playerImage);
+
+            isInit = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void changePlayerPic(BufferedImage image) throws Exception {
+
+        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
+        player.setIBackground(image);
+    }
+
+    private void getFields() throws Exception {
+        enemyPlayerField = ApoSkunkmanAIEnemy.class.getDeclaredField("player");
+        enemyPlayerField.setAccessible(true);
+
+        apoLevelField = ApoSkunkmanAILevel.class.getDeclaredField("level");
+        apoLevelField.setAccessible(true);
+
+        apoPlayerField = ApoSkunkmanAIPlayer.class.getDeclaredField("player");
+        apoPlayerField.setAccessible(true);
+
+    }
+
+    // © http://cdn.memegenerator.net/images/160x/2769555.jpg
+    private BufferedImage playerImage;
+
+    private void loadPics() throws Exception {
+        playerImage = ImageIO.read(new File(Meldanor.DIR, "GoodGuyGreg.png"));
     }
 
     public boolean isInit() {
@@ -34,6 +85,8 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
     @Override
     public void tick(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
+        this.apoLevel = apoLevel;
+        this.apoPlayer = apoPlayer;
         if (isInit) {
 
             handleLevel(System.currentTimeMillis() - time);
