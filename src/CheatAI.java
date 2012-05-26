@@ -94,10 +94,15 @@ public class CheatAI implements Tickable, Initiationable {
         try {
             Field enemyPlayerField = ApoSkunkmanAIEnemy.class.getDeclaredField("player");
             enemyPlayerField.setAccessible(true);
-            String pName = null;
+            ApoSkunkmanAI ai = null;
             for (ApoSkunkmanAIEnemy apoSkunkmanAIEnemy : enemies) {
-                pName = ((ApoSkunkmanPlayer) enemyPlayerField.get(apoSkunkmanAIEnemy)).getAi().getPlayerName();
-                if (pName.equalsIgnoreCase("Meldanor"))
+
+                // WHEN AI == NULL , AI IS HUMAN
+                ai = ((ApoSkunkmanPlayer) enemyPlayerField.get(apoSkunkmanAIEnemy)).getAi();
+                if (ai == null)
+                    continue;
+
+                if (ai.getPlayerName().equalsIgnoreCase("Meldanor"))
                     return true;
             }
 
