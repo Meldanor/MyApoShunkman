@@ -13,6 +13,8 @@ import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAILevelSkunkman;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 import apoSkunkman.entity.ApoSkunkmanPlayer;
+import apoSkunkman.entity.ApoSkunkmanSkunkman;
+import apoSkunkman.level.ApoSkunkmanLevel;
 
 /*
  * Copyright (C) 2012 Kilian Gaertner
@@ -105,7 +107,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
     }
 
-    private long checkPlayerTimer = 4000L;
+    private long checkPlayerTimer = 2000;
 
     private void handleLevel(long delta) {
         try {
@@ -113,7 +115,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
             checkMySelf();
 
             if ((checkPlayerTimer -= delta) <= 0)
-                checkPlayer();
+                checkEnemiesInDanger();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,7 +128,8 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
         byte[][] byteLevel = apoLevel.getLevelAsByte();
 
-        Point myPosition = new Point((int) apoPlayer.getX(), (int) apoPlayer.getX());
+        Point myPosition = new Point((int) apoPlayer.getX(), (int) apoPlayer.getY());
+        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
 
         for (int y = 0; y < byteLevel.length; ++y) {
             for (int x = 0; x < byteLevel[y].length; ++x) {
@@ -134,7 +137,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
                     ApoSkunkmanAILevelSkunkman skunk = apoLevel.getSkunkman(y, x);
                     // IN MY ROW / COLUMN AND CAN HIT ME
                     if (bombCanHit(myPosition, skunk, byteLevel))
-                        teleportRandom();
+                        teleportRandom(player);
                 }
             }
         }
@@ -153,13 +156,8 @@ public class CheatAIHuman implements Tickable, Initiationable {
         // BOMB IS NOT IN THE ROW OF PLAYER
         // OR
         // BOMB RADIUS TOO LOW
-        
-        // TODO : Nach einmal wegteleportieren kommen seltsame ergebnisse raus
-        if ((diff.x != 0 && diff.y != 0) || playerPoint.distance(bombPoint) > bomb.getSkunkWidth()) {
-            System.out.println(diff + "  " + playerPoint.distance(bombPoint) + " " + bomb.getSkunkWidth());
+        if ((diff.x != 0 && diff.y != 0) || playerPoint.distance(bombPoint) > bomb.getSkunkWidth())
             return false;
-
-        }
 
         diff.x = (int) Math.signum(diff.x);
         diff.y = (int) Math.signum(diff.y);
@@ -180,25 +178,27 @@ public class CheatAIHuman implements Tickable, Initiationable {
         // THERE WAS NO BARIER BETWEEN PLAYER AND BOMB
         return true;
     }
+
     private boolean isBarrier(int x, int y, byte[][] byteLevel) {
         return byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_BUSH || byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_STONE;
     }
 
-    private void teleportRandom() throws Exception {
-        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
+    private void teleportRandom(ApoSkunkmanPlayer player) throws Exception {
 
         int x = 0;
         int y = 0;
-        Point bombPoint = null;
+        Point targetPoint = null;
 
         // SEARCH FOR A TILE TO TELEPORT TO
         do {
             x = RAND.nextInt(ApoSkunkmanConstants.LEVEL_WIDTH - 1) + 1;
             y = RAND.nextInt(ApoSkunkmanConstants.LEVEL_HEIGHT - 1) + 1;
-            bombPoint = new Point(x, y);
-        } while (!isFree(bombPoint));
-        player.setX(bombPoint.x * ApoSkunkmanConstants.TILE_SIZE);
-        player.setY(bombPoint.y * ApoSkunkmanConstants.TILE_SIZE);
+            targetPoint = new Point(x, y);
+        } while (!isFree(targetPoint));
+
+        // TELEPORT THE PLAYER TO THIS RANDOM POSITION
+        player.setX(targetPoint.x * ApoSkunkmanConstants.TILE_SIZE);
+        player.setY(targetPoint.y * ApoSkunkmanConstants.TILE_SIZE);
     }
 
     // RETURNS TRUE WHEN ON THE FIELD IS NOTHING(NOR A GOODIE)
@@ -206,10 +206,58 @@ public class CheatAIHuman implements Tickable, Initiationable {
         return apoLevel.getLevelAsByte()[p.y][p.x] == ApoSkunkmanAIConstants.LEVEL_FREE;
     }
 
-    private void checkPlayer() throws Exception {
+    private void checkEnemiesInDanger() throws Exception {
 
-        checkPlayerTimer = 4000L;
+        byte[][] byteLevel = apoLevel.getLevelAsByte();
+        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
+        Point playerPosition = null;
+        ApoSkunkmanPlayer player = null;
+
+        // LOOK FOR THE BOMB
+        for (int y = 0; y < byteLevel.length; ++y) {
+            for (int x = 0; x < byteLevel[y].length; ++x) {
+                // THERE IS A BOMB
+                if (byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_SKUNKMAN) {
+                    // GET THE SKUNK
+                    ApoSkunkmanAILevelSkunkman skunk = apoLevel.getSkunkman(y, x);
+
+                    // IGNORE BOMBS WHICH WAS PLANTED A FEW MOMENTS AGO
+                    if (!(skunk.getTimeToExplosion() >= ApoSkunkmanConstants.SKUNKMAN_TIME_TO_EXPLODE - 1000)) {
+
+                        // CHECK IF THE BOMB CAN HIT ANY ENEMY
+                        for (ApoSkunkmanAIEnemy enemy : enemies) {
+                            playerPosition = new Point((int) enemy.getX(), (int) enemy.getY());
+
+                            // CAN THE BOMB HIT THE ENEMY?
+                            if (bombCanHit(playerPosition, skunk, byteLevel)) {
+                                player = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
+
+                                // TELEPORT OR DELETE THE BOMB?
+                                boolean teleport = RAND.nextBoolean();
+                                if (teleport) {
+                                    teleportRandom(player);
+                                    CheatAI.displayMessage("You were in danger...I've teleported you", apoLevel);
+                                } else {
+                                    deleteBomb(skunk, player);
+                                    CheatAI.displayMessage("You were in danger...I've delete the bomb", apoLevel);
+                                }
+                            }
+                        }
+                    } else
+                        System.out.println("gerade gelegt");
+                }
+            }
+        }
+
+        checkPlayerTimer = 2000;
 
     }
 
+    private void deleteBomb(ApoSkunkmanAILevelSkunkman bomb, ApoSkunkmanPlayer player) throws Exception {
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        if (level.getLevel()[(int) bomb.getY()][(int) bomb.getX()] instanceof ApoSkunkmanSkunkman) {
+            level.getLevel()[(int) bomb.getY()][(int) bomb.getX()] = null;
+            player.setCurSkunkman(player.getCurSkunkman() - 1);
+        }
+    }
 }
