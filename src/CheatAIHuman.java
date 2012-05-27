@@ -82,8 +82,15 @@ public class CheatAIHuman implements Tickable, Initiationable {
     // © http://cdn.memegenerator.net/images/160x/2769555.jpg
     private BufferedImage playerImage;
 
+    // ©http://levelselect.co.uk/wp-content/uploads/2010/03/portal_thumbnail.png
+    private BufferedImage portalStartImage;
+    private BufferedImage portalEndImage;
+
     private void loadPics() throws Exception {
         playerImage = ImageIO.read(new File(Meldanor.DIR, "GoodGuyGreg.png"));
+
+        portalStartImage = ImageIO.read(new File(Meldanor.DIR, "PortalStart.png"));
+        portalEndImage = ImageIO.read(new File(Meldanor.DIR, "PortalEnd.png"));
     }
 
     public boolean isInit() {
@@ -185,8 +192,14 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
     private void teleportRandom(ApoSkunkmanPlayer player) throws Exception {
 
-        int x = 0;
-        int y = 0;
+        int x = (int) player.getX() / ApoSkunkmanConstants.TILE_SIZE;
+        int y = (int) player.getY() / ApoSkunkmanConstants.TILE_SIZE;
+
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+
+        if (level.getLevel()[y][x] == null)
+            level.getLevel()[y][x] = new TrollPortalEntity(portalStartImage, x, y, level);
+
         Point targetPoint = null;
 
         // SEARCH FOR A TILE TO TELEPORT TO
@@ -199,8 +212,9 @@ public class CheatAIHuman implements Tickable, Initiationable {
         // TELEPORT THE PLAYER TO THIS RANDOM POSITION
         player.setX(targetPoint.x * ApoSkunkmanConstants.TILE_SIZE);
         player.setY(targetPoint.y * ApoSkunkmanConstants.TILE_SIZE);
-    }
 
+        level.getLevel()[targetPoint.y][targetPoint.x] = new TrollPortalEntity(portalEndImage, x, y, level);
+    }
     // RETURNS TRUE WHEN ON THE FIELD IS NOTHING(NOR A GOODIE)
     private boolean isFree(Point p) {
         return apoLevel.getLevelAsByte()[p.y][p.x] == ApoSkunkmanAIConstants.LEVEL_FREE;
