@@ -114,7 +114,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
     }
 
-    private long checkPlayerTimer = 2000;
+    private long checkPlayerTimer = 1750L;
 
     private void handleLevel(long delta) {
         try {
@@ -129,14 +129,12 @@ public class CheatAIHuman implements Tickable, Initiationable {
         }
 
     }
-
     // IS THERE A BOMB WHICH CAN HIT MYSELF?
     private void checkMySelf() throws Exception {
 
         byte[][] byteLevel = apoLevel.getLevelAsByte();
 
         Point myPosition = new Point((int) apoPlayer.getX(), (int) apoPlayer.getY());
-        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
 
         for (int y = 0; y < byteLevel.length; ++y) {
             for (int x = 0; x < byteLevel[y].length; ++x) {
@@ -144,7 +142,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
                     ApoSkunkmanAILevelSkunkman skunk = apoLevel.getSkunkman(y, x);
                     // IN MY ROW / COLUMN AND CAN HIT ME
                     if (bombCanHit(myPosition, skunk, byteLevel))
-                        teleportRandom(player);
+                        teleportRandom();
                 }
             }
         }
@@ -190,7 +188,9 @@ public class CheatAIHuman implements Tickable, Initiationable {
         return byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_BUSH || byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_STONE;
     }
 
-    private void teleportRandom(ApoSkunkmanPlayer player) throws Exception {
+    private void teleportRandom() throws Exception {
+
+        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
 
         int x = (int) player.getX() / ApoSkunkmanConstants.TILE_SIZE;
         int y = (int) player.getY() / ApoSkunkmanConstants.TILE_SIZE;
@@ -215,6 +215,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
         level.getLevel()[targetPoint.y][targetPoint.x] = new TrollPortalEntity(portalEndImage, x, y, level);
     }
+
     // RETURNS TRUE WHEN ON THE FIELD IS NOTHING(NOR A GOODIE)
     private boolean isFree(Point p) {
         return apoLevel.getLevelAsByte()[p.y][p.x] == ApoSkunkmanAIConstants.LEVEL_FREE;
@@ -245,16 +246,9 @@ public class CheatAIHuman implements Tickable, Initiationable {
                             // CAN THE BOMB HIT THE ENEMY?
                             if (bombCanHit(playerPosition, skunk, byteLevel)) {
                                 player = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
+                                deleteBomb(skunk, player);
+                                CheatAI.displayMessage("You were in danger...I've delete the bomb", apoLevel);
 
-                                // TELEPORT OR DELETE THE BOMB?
-                                boolean teleport = RAND.nextBoolean();
-                                if (teleport) {
-                                    teleportRandom(player);
-                                    CheatAI.displayMessage("You were in danger...I've teleported you", apoLevel);
-                                } else {
-                                    deleteBomb(skunk, player);
-                                    CheatAI.displayMessage("You were in danger...I've delete the bomb", apoLevel);
-                                }
                             }
                         }
                     } else
@@ -263,7 +257,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
             }
         }
 
-        checkPlayerTimer = 2000;
+        checkPlayerTimer = 1750L;
 
     }
 

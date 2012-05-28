@@ -16,16 +16,15 @@ import apoSkunkman.level.ApoSkunkmanLevel;
 
 public class TrollPortalEntity extends ApoSkunkmanEntity {
 
-    private static final long PORTAL_VISIBLE_TIME = 1000L;
+    private static final long PORTAL_VISIBLE_TIME = 500L;
 
     private long visibleTimer = PORTAL_VISIBLE_TIME;
     private ApoSkunkmanLevel level;
 
     public TrollPortalEntity(BufferedImage image, float x, float y, ApoSkunkmanLevel level) {
         super(image, x * ApoSkunkmanConstants.TILE_SIZE, y * ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE);
-        setBVisible(true);
-        setBOpaque(false);
         this.level = level;
+        setBVisible(true);
     }
 
     @Override
