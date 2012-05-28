@@ -40,13 +40,14 @@ public class CheatAIHuman implements Tickable, Initiationable {
     private Field apoLevelField;
 
     public CheatAIHuman() {
-        System.out.println("Wir helfen nun den Spielern!");
     }
 
     @Override
     public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
 
         try {
+
+            CheatAI.displayMessage("Hey Guys, do you need help?", apoLevel);
 
             getFields();
 
@@ -251,8 +252,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
                             }
                         }
-                    } else
-                        System.out.println("gerade gelegt");
+                    }
                 }
             }
         }
