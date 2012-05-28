@@ -1,8 +1,6 @@
 import java.awt.Point;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.TreeSet;
 
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 
@@ -27,7 +25,7 @@ public class AStar {
     // OPENLIST AS BINARY HEAP QUEUE
     private PriorityQueue<Node> openList = new PriorityQueue<Node>();
     // CLOSED LIST BASED OF AN HASH TREE
-    private TreeSet<Node> closedList = new TreeSet<Node>();
+    private LinkedList<Node> closedList = new LinkedList<Node>();
 
     public AStar(ApoSkunkmanAILevel apoLevel) {
         this.level = new AStarLevel(apoLevel);
@@ -65,7 +63,6 @@ public class AStar {
                 if (neighbor == null)
                     continue;
                 // IGNORE NODES WHICH ARE IN CLOSED LIST
-                // O(LOG(N))
                 if (closedList.contains(neighbor))
                     continue;
                 // O(N)
@@ -97,20 +94,19 @@ public class AStar {
     public LinkedList<Node> getPath() {
         if (closedList == null)
             return null;
+
         // THE PATH
         LinkedList<Node> list = new LinkedList<Node>();
         // GET LAST ADDED NODE
-        Node node = closedList.first();
+        Node node = closedList.getLast();
         list.add(node);
 
         // ITERATE BACKWARDS THROUGH THE NODES
         while (node.getPrev() != null) {
             node = node.getPrev();
-            list.add(node);
+            list.addFirst(node);
         }
 
-        // REVERSE THE PATH
-        Collections.reverse(list);
         // REMOVE POINT OF PLAYER FIGURE, BECAUSE WE DON'T NEED TO GO THERE
         list.removeFirst();
         return list;
