@@ -240,6 +240,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
         // THERE WAS NO BARIER BETWEEN PLAYER AND BOMB
         return true;
     }
+
     private boolean isBarrier(int x, int y, byte[][] byteLevel) {
         return byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_BUSH || byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_STONE;
     }
@@ -303,7 +304,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
                             if (bombCanHit(playerPosition, skunk, byteLevel)) {
                                 player = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
                                 deleteBomb(skunk, player);
-                                CheatAI.displayMessage("You were in danger...I've delete the bomb", apoLevel);
+                                CheatAI.displayMessage("You were in danger...I've deleted the bomb", apoLevel);
 
                             }
                         }
