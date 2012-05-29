@@ -55,23 +55,8 @@ public class CheatAIBots implements Initiationable, Tickable {
         this.apoLevel = apoLevel;
         this.apoPlayer = apoPlayer;
         try {
-            enemyPlayerField = ApoSkunkmanAIEnemy.class.getDeclaredField("player");
-            enemyPlayerField.setAccessible(true);
 
-            apoLevelField = ApoSkunkmanAILevel.class.getDeclaredField("level");
-            apoLevelField.setAccessible(true);
-
-            apoPlayerField = ApoSkunkmanAIPlayer.class.getDeclaredField("player");
-            apoPlayerField.setAccessible(true);
-
-            bombWidthField = ApoSkunkmanPlayer.class.getDeclaredField("curWidth");
-            bombWidthField.setAccessible(true);
-
-            maxBombsField = ApoSkunkmanPlayer.class.getDeclaredField("maxSkunkman");
-            maxBombsField.setAccessible(true);
-
-            enemySpeedField = ApoSkunkmanPlayer.class.getDeclaredField("speed");
-            enemySpeedField.setAccessible(true);
+            getFields();
 
             loadPics();
 
@@ -86,6 +71,26 @@ public class CheatAIBots implements Initiationable, Tickable {
             e.printStackTrace();
         }
 
+    }
+
+    private void getFields() throws Exception {
+        enemyPlayerField = ApoSkunkmanAIEnemy.class.getDeclaredField("player");
+        enemyPlayerField.setAccessible(true);
+
+        apoLevelField = ApoSkunkmanAILevel.class.getDeclaredField("level");
+        apoLevelField.setAccessible(true);
+
+        apoPlayerField = ApoSkunkmanAIPlayer.class.getDeclaredField("player");
+        apoPlayerField.setAccessible(true);
+
+        bombWidthField = ApoSkunkmanPlayer.class.getDeclaredField("curWidth");
+        bombWidthField.setAccessible(true);
+
+        maxBombsField = ApoSkunkmanPlayer.class.getDeclaredField("maxSkunkman");
+        maxBombsField.setAccessible(true);
+
+        enemySpeedField = ApoSkunkmanPlayer.class.getDeclaredField("speed");
+        enemySpeedField.setAccessible(true);
     }
 
     // © http://img834.imageshack.us/img834/1918/textest.jpg
