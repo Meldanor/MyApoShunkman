@@ -1,6 +1,8 @@
 import java.awt.Point;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 
@@ -24,8 +26,10 @@ public class AStar {
 
     // OPENLIST AS BINARY HEAP QUEUE
     private PriorityQueue<Node> openList = new PriorityQueue<Node>();
-    // CLOSED LIST BASED OF AN HASH TREE
-    private LinkedList<Node> closedList = new LinkedList<Node>();
+    // CLOSED LIST BASED OF AN HASH SET
+    private Set<Node> closedList = new HashSet<Node>();
+    // THE LAST NODE ADDED TO CLOSED LIST
+    private Node lastNode;
 
     public AStar(ApoSkunkmanAILevel apoLevel) {
         this.level = new AStarLevel(apoLevel);
@@ -48,9 +52,14 @@ public class AStar {
             // O(1)
             current = openList.poll();
 
+            // ADD TO CLOSED LIST
+            // O(1)
             closedList.add(current);
 
-            // GOAL FOUND!
+            // TEMP SAVE THE LAST ADDED NODE
+            lastNode = current;
+
+            // GOAL FOUND - STOP ASTAR
             if (current.equals(goal))
                 return;
 
@@ -92,13 +101,15 @@ public class AStar {
 
     // GENERATE THE FOUND PATH
     public LinkedList<Node> getPath() {
+
+        // NO WAY FOUND
         if (closedList == null)
             return null;
 
         // THE PATH
         LinkedList<Node> list = new LinkedList<Node>();
         // GET LAST ADDED NODE
-        Node node = closedList.getLast();
+        Node node = lastNode;
         list.add(node);
 
         // ITERATE BACKWARDS THROUGH THE NODES
