@@ -13,16 +13,27 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
 public class CheatAIEpicBattle implements Tickable, Initiationable {
 
+    private boolean isInit = false;
+
+    private ApoSkunkmanAILevel apoLevel;
+    private ApoSkunkmanAIPlayer apoPlayer;
+
+    // Idee: Beide KIs stehen sich gegenüber und zwischen beide ist eine Brücke.
+    // Der Hintergrund wechselt ca. alle 10
     @Override
     public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
-        // TODO Auto-generated method stub
+
+        try {
+
+        } catch (Exception e) {
+
+        }
 
     }
 
     @Override
     public boolean isInit() {
-        // TODO Auto-generated method stub
-        return false;
+        return isInit;
     }
 
     @Override
