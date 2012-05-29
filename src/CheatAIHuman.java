@@ -120,7 +120,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
     }
 
     private long checkPlayerTimer = 1750L;
-    private long giveGoodieTimer = 5000L;
+    private long giveGoodieTimer = 7500L;
 
     private void handleLevel(long delta) {
         try {
@@ -143,18 +143,24 @@ public class CheatAIHuman implements Tickable, Initiationable {
     private Field aiField = null;
 
     private void giveGoodie() throws Exception {
+
+        // GET RANDOM ENEMY
         ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
-        int enemyID = RAND.nextInt(enemies.length);
-        ApoSkunkmanAIEnemy enemy = enemies[enemyID];
+        ApoSkunkmanAIEnemy enemy = enemies[RAND.nextInt(enemies.length)];
 
         ApoSkunkmanPlayer enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
 
+        // GET RANDOM GOODIE
         int goodieID = RAND.nextInt(4) + 1;
-
+        // ADD GOODIE TO RANDOM ENEMY
         enemyPlayer.addGoodie(goodieID);
 
+        // DISPLAY MESSAGE
+
+        // GET THE AI OF THE RANDOM ENEMY
         ApoSkunkmanAI ai = (ApoSkunkmanAI) aiField.get(enemyPlayer);
         String playerName = "";
+        // WHEN AI == NULL , THE PLAYER IS CONTROLLED DIRECTLY BY A HUMAN
         if (ai == null)
             playerName = "Human";
         else
@@ -177,9 +183,10 @@ public class CheatAIHuman implements Tickable, Initiationable {
                 break;
         }
 
-        giveGoodieTimer = 5000L;
+        giveGoodieTimer = 7500L;
     }
 
+    // WHEN TRUE IT DOESN'T CHECK HIS POSITION
     private boolean hasSurrender = false;
 
     // IS THERE A BOMB WHICH CAN HIT MYSELF?
@@ -210,7 +217,8 @@ public class CheatAIHuman implements Tickable, Initiationable {
     private boolean bombCanHit(Point playerPoint, ApoSkunkmanAILevelSkunkman bomb, byte[][] byteLevel) {
 
         Point bombPoint = new Point((int) bomb.getX(), (int) bomb.getY());
-        // I'M STANDING ON THE BOMB
+
+        // PLAYER IS ON THE BOMB
         if (bombPoint.equals(playerPoint))
             return true;
 
@@ -249,11 +257,12 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
         ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
 
-        int x = (int) player.getX() / ApoSkunkmanConstants.TILE_SIZE;
-        int y = (int) player.getY() / ApoSkunkmanConstants.TILE_SIZE;
+        int x = apoPlayer.getPlayerX();
+        int y = apoPlayer.getPlayerY();
 
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
 
+        // CREATE A PORTAL AT PLAYERS START POSITION
         if (level.getLevel()[y][x] == null)
             level.getLevel()[y][x] = new TrollPortalEntity(portalStartImage, x, y, level);
 
@@ -270,6 +279,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
         player.setX(targetPoint.x * ApoSkunkmanConstants.TILE_SIZE);
         player.setY(targetPoint.y * ApoSkunkmanConstants.TILE_SIZE);
 
+        // CREATE A PORTAL END AT TARGET POSITION
         level.getLevel()[targetPoint.y][targetPoint.x] = new TrollPortalEntity(portalEndImage, x, y, level);
     }
 
@@ -319,8 +329,11 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
     private void deleteBomb(ApoSkunkmanAILevelSkunkman bomb, ApoSkunkmanPlayer player) throws Exception {
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+
         if (level.getLevel()[(int) bomb.getY()][(int) bomb.getX()] instanceof ApoSkunkmanSkunkman) {
+            // REMOVE BOMB FROM FIELD
             level.getLevel()[(int) bomb.getY()][(int) bomb.getX()] = null;
+            // PLAYER CAN LAY SKUNKMAN
             player.setCurSkunkman(player.getCurSkunkman() - 1);
         }
     }
