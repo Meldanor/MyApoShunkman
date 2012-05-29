@@ -12,7 +12,7 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  * begegnen.
  */
 
-public class AIManager implements Tickable, Initiationable {
+public class AIManager implements Tickable {
 
     // KI MANAGER HAS ALL NECESSARY VALUES?
     private boolean isInit = false;
@@ -26,25 +26,20 @@ public class AIManager implements Tickable, Initiationable {
         // EMPTY CONSTRUCTOR
     }
 
-    @Override
     public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
 
         // CREATE WRAPPER
         melPlayer = new MeldanorPlayer(apoPlayer, apoLevel);
 
         if (apoLevel.getType() == ApoSkunkmanAIConstants.LEVEL_TYPE_GOAL_X)
-            ai = new AIGoalX(melPlayer, apoPlayer, apoLevel);
-        else {
-            // TODO: Implement second AI for handeling fighting the bots
-        }
+            // AI HANDLER FOR THE GOAL-X TASK
+            ai = new AIGoalX(melPlayer, apoLevel);
+        else
+            // AI HANDLER TO DESTROY LEFT-RIGHT-BOT
+            ai = new AILeftRightBot(melPlayer, apoPlayer, apoLevel);
 
         isInit = true;
 
-    }
-
-    @Override
-    public boolean isInit() {
-        return isInit;
     }
 
     @Override

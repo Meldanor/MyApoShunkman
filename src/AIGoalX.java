@@ -32,14 +32,14 @@ public class AIGoalX implements Tickable {
     // GOAL TO TAKE COVER (AFTER BOMB HAS BEEN FOUND)
     private Goal coverGoal;
 
-    public AIGoalX(MeldanorPlayer melPlayer, ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
+    public AIGoalX(MeldanorPlayer melPlayer, ApoSkunkmanAILevel apoLevel) {
         this.melPlayer = melPlayer;
-        init(apoPlayer, apoLevel);
+        this.apoLevel = apoLevel;
+
+        init();
     }
 
-    public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
-
-        this.apoLevel = apoLevel;
+    public void init() {
         // CALCULATE THE WAY TO THE GOAL - IGNORE BUSHES
         // CREATE SUB GOALS TO BOMB THE BUSHES
         searchPathToGoal();
