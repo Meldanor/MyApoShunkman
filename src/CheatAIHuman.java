@@ -154,21 +154,26 @@ public class CheatAIHuman implements Tickable, Initiationable {
         enemyPlayer.addGoodie(goodieID);
 
         ApoSkunkmanAI ai = (ApoSkunkmanAI) aiField.get(enemyPlayer);
+        String playerName = "";
+        if (ai == null)
+            playerName = "Human";
+        else
+            playerName = ai.getPlayerName();
         switch (goodieID) {
             case ApoSkunkmanConstants.GOODIE_GOOD_WIDTH :
-                CheatAI.displayMessage(ai.getPlayerName() + "'s bomb radius increased", apoLevel);
+                CheatAI.displayMessage(playerName + "'s bomb radius increased", apoLevel);
                 break;
 
             case ApoSkunkmanConstants.GOODIE_GOOD_SKUNKMAN :
-                CheatAI.displayMessage(ai.getPlayerName() + "'s can lay a bomb more", apoLevel);
+                CheatAI.displayMessage(playerName + "'s can lay a bomb more", apoLevel);
                 break;
 
             case ApoSkunkmanConstants.GOODIE_GOOD_FAST :
-                CheatAI.displayMessage(ai.getPlayerName() + "'s can run faster", apoLevel);
+                CheatAI.displayMessage(playerName + "'s can run faster", apoLevel);
                 break;
 
             case ApoSkunkmanConstants.GOODIE_GOOD_GOD :
-                CheatAI.displayMessage(ai.getPlayerName() + "'s got gods bless", apoLevel);
+                CheatAI.displayMessage(playerName + "'s got gods bless", apoLevel);
                 break;
         }
 
@@ -222,21 +227,19 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
         // CHECK WHETHER THERE IS A BARRIER BETWEEN BOMB AND PLAYER
         if (diff.x != 0) {
-            for (int x = bombPoint.x + diff.x; x < playerPoint.x; x += diff.x) {
+            for (int x = playerPoint.x + diff.x; x != bombPoint.x; x += diff.x)
                 if (isBarrier(x, bombPoint.y, byteLevel))
                     return false;
-            }
-        } else {
-            for (int y = bombPoint.y + diff.y; y < playerPoint.y; y += diff.y) {
+        } else if (diff.y != 0) {
+            for (int y = playerPoint.y + diff.y; y != bombPoint.y; y += diff.y)
                 if (isBarrier(bombPoint.x, y, byteLevel))
                     return false;
-            }
+
         }
 
         // THERE WAS NO BARIER BETWEEN PLAYER AND BOMB
         return true;
     }
-
     private boolean isBarrier(int x, int y, byte[][] byteLevel) {
         return byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_BUSH || byteLevel[y][x] == ApoSkunkmanAIConstants.LEVEL_STONE;
     }

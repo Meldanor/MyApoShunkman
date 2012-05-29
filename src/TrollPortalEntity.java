@@ -1,7 +1,7 @@
 import java.awt.image.BufferedImage;
 
 import apoSkunkman.ApoSkunkmanConstants;
-import apoSkunkman.entity.ApoSkunkmanGoodie;
+import apoSkunkman.entity.ApoSkunkmanEntity;
 import apoSkunkman.level.ApoSkunkmanLevel;
 
 /*
@@ -14,7 +14,7 @@ import apoSkunkman.level.ApoSkunkmanLevel;
  * begegnen.
  */
 
-public class TrollPortalEntity extends ApoSkunkmanGoodie {
+public class TrollPortalEntity extends ApoSkunkmanEntity {
 
     private static final long PORTAL_VISIBLE_TIME = 500L;
 
@@ -22,7 +22,7 @@ public class TrollPortalEntity extends ApoSkunkmanGoodie {
     private ApoSkunkmanLevel level;
 
     public TrollPortalEntity(BufferedImage image, float x, float y, ApoSkunkmanLevel level) {
-        super(image, x * ApoSkunkmanConstants.TILE_SIZE, y * ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.GOODIE_EMPTY);
+        super(image, x * ApoSkunkmanConstants.TILE_SIZE, y * ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE);
         this.level = level;
         setBVisible(true);
     }
