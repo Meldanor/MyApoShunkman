@@ -18,9 +18,7 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  * begegnen.
  */
 
-public class AIGoalX implements Tickable, Initiationable {
-
-    private boolean isInit = false;
+public class AIGoalX implements Tickable {
 
     private MeldanorPlayer melPlayer;
     private ApoSkunkmanAILevel apoLevel;
@@ -39,14 +37,12 @@ public class AIGoalX implements Tickable, Initiationable {
         init(apoPlayer, apoLevel);
     }
 
-    @Override
     public void init(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
 
         this.apoLevel = apoLevel;
         // CALCULATE THE WAY TO THE GOAL - IGNORE BUSHES
         // CREATE SUB GOALS TO BOMB THE BUSHES
         searchPathToGoal();
-        isInit = true;
     }
 
     private void searchPathToGoal() {
@@ -78,11 +74,6 @@ public class AIGoalX implements Tickable, Initiationable {
         currentGoal = goals.poll();
         // CALCULATE FIRST
         ((WalkGoal) currentGoal).calculateWay(apoLevel);
-    }
-
-    @Override
-    public boolean isInit() {
-        return isInit;
     }
 
     @Override
