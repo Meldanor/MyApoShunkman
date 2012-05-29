@@ -104,7 +104,7 @@ public class MeldanorPlayer implements Updateable {
     }
 
     public Point getPosition() {
-        return new Point((int) apoPlayer.getX(), (int) apoPlayer.getY());
+        return new Point(apoPlayer.getPlayerX(), apoPlayer.getPlayerY());
     }
 
     @Override
