@@ -197,7 +197,7 @@ public class TakeCoverGoal extends Goal {
         Point cover = null;
         // THE OFFSET
         int i = 1;
-        for (; i <= radius + 1; ++i) {
+        for (; i <= radius ; ++i) {
 
             // CHECK NEGATIVE X-OFFSET
             if (negX) {
