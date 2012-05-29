@@ -7,6 +7,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import apoSkunkman.ApoSkunkmanConstants;
+import apoSkunkman.ai.ApoSkunkmanAI;
 import apoSkunkman.ai.ApoSkunkmanAIConstants;
 import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
@@ -78,6 +79,9 @@ public class CheatAIHuman implements Tickable, Initiationable {
         apoPlayerField = ApoSkunkmanAIPlayer.class.getDeclaredField("player");
         apoPlayerField.setAccessible(true);
 
+        aiField = ApoSkunkmanPlayer.class.getDeclaredField("ai");
+        aiField.setAccessible(true);
+
     }
 
     // © http://cdn.memegenerator.net/images/160x/2769555.jpg
@@ -116,20 +120,63 @@ public class CheatAIHuman implements Tickable, Initiationable {
     }
 
     private long checkPlayerTimer = 1750L;
+    private long giveGoodieTimer = 5000L;
 
     private void handleLevel(long delta) {
         try {
 
-            checkMySelf();
+            if (!hasSurrender)
+                checkMySelf();
 
             if ((checkPlayerTimer -= delta) <= 0)
                 checkEnemiesInDanger();
+
+            if ((giveGoodieTimer -= delta) <= 0)
+                giveGoodie();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
+    private Field aiField = null;
+
+    private void giveGoodie() throws Exception {
+        ApoSkunkmanAIEnemy[] enemies = apoLevel.getEnemies();
+        int enemyID = RAND.nextInt(enemies.length);
+        ApoSkunkmanAIEnemy enemy = enemies[enemyID];
+
+        ApoSkunkmanPlayer enemyPlayer = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
+
+        int goodieID = RAND.nextInt(4) + 1;
+
+        enemyPlayer.addGoodie(goodieID);
+
+        ApoSkunkmanAI ai = (ApoSkunkmanAI) aiField.get(enemyPlayer);
+        switch (goodieID) {
+            case ApoSkunkmanConstants.GOODIE_GOOD_WIDTH :
+                CheatAI.displayMessage(ai.getPlayerName() + "'s bomb radius increased", apoLevel);
+                break;
+
+            case ApoSkunkmanConstants.GOODIE_GOOD_SKUNKMAN :
+                CheatAI.displayMessage(ai.getPlayerName() + "'s can lay a bomb more", apoLevel);
+                break;
+
+            case ApoSkunkmanConstants.GOODIE_GOOD_FAST :
+                CheatAI.displayMessage(ai.getPlayerName() + "'s can run faster", apoLevel);
+                break;
+
+            case ApoSkunkmanConstants.GOODIE_GOOD_GOD :
+                CheatAI.displayMessage(ai.getPlayerName() + "'s got gods bless", apoLevel);
+                break;
+        }
+
+        giveGoodieTimer = 5000L;
+    }
+
+    private boolean hasSurrender = false;
+
     // IS THERE A BOMB WHICH CAN HIT MYSELF?
     private void checkMySelf() throws Exception {
 
@@ -146,6 +193,11 @@ public class CheatAIHuman implements Tickable, Initiationable {
                         teleportRandom();
                 }
             }
+        }
+
+        if (apoLevel.getEnemies().length == 1) {
+            CheatAI.displayMessage("You are the last one...I surrender", apoLevel);
+            hasSurrender = true;
         }
 
     }
