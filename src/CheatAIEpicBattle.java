@@ -2,11 +2,11 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
 import apoSkunkman.ApoSkunkmanConstants;
-import apoSkunkman.ApoSkunkmanImageContainer;
 import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
@@ -35,6 +35,8 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
 
     private Field apoLevelField;
     private Field apoPlayerField;
+
+    private static final Random RAND = new Random();
 
     private boolean isLeftOne;
 
@@ -148,8 +150,13 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
         }
     }
 
+    private long dropBombTimer = 1000L;
+
     private void handleLevel(long delta) {
         try {
+
+            if ((dropBombTimer -= delta) <= 0)
+                dropBomb();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,8 +164,32 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
 
     }
 
+    private void dropBomb() throws Exception {
+
+        int x = 0;
+        int y = 0;
+
+        // RANDOM POINT
+        do {
+            x = RAND.nextInt(13) + 1;
+            y = RAND.nextInt(13) + 1;
+        }
+        // ARE NOT ALLOWDED TO BE ON THE SAME X OR Y AXIS AS THE MELDANORS
+        while ((y == 7) || (x == 2 || x == 12));
+
+        // LAY BOMB
+        layBomb(x, y);
+
+        dropBombTimer = 1500L;
+    }
+
+    private void layBomb(int x, int y) throws Exception {
+        layBomb(new Point(x, y));
+    }
+
     private void layBomb(Point p) throws Exception {
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        // DON'T LAY THE BOMB DIRECTLY -> WE WANT A BOMB PRE EFFECT FOR IT
         level.getLevel()[p.y][p.x] = new TrollAtomicBombEntity(p.x, p.y, level, apoPlayer.getPlayer());
     }
 
