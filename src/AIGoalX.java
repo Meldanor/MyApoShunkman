@@ -79,7 +79,7 @@ public class AIGoalX implements Tickable {
     @Override
     public void tick(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
         this.apoLevel = apoLevel;
-        melPlayer.update(apoPlayer, apoLevel);
+        melPlayer.update(apoPlayer);
         handleLevel();
     }
 

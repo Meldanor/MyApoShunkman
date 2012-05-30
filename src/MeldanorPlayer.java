@@ -21,7 +21,7 @@ import apoSkunkman.ai.ApoSkunkmanAIPlayer;
  * @author Meldanor
  * 
  */
-public class MeldanorPlayer implements Updateable {
+public class MeldanorPlayer {
 
     /** The apo player this MeldanorPlayer is wrapping around */
     public ApoSkunkmanAIPlayer apoPlayer;
@@ -30,7 +30,7 @@ public class MeldanorPlayer implements Updateable {
     private int direction = Integer.MIN_VALUE;
 
     public MeldanorPlayer(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
-        this.update(apoPlayer, apoLevel);
+        this.update(apoPlayer);
     }
 
     /**
@@ -107,8 +107,7 @@ public class MeldanorPlayer implements Updateable {
         return new Point(apoPlayer.getPlayerX(), apoPlayer.getPlayerY());
     }
 
-    @Override
-    public void update(ApoSkunkmanAIPlayer apoPlayer, ApoSkunkmanAILevel apoLevel) {
+    public void update(ApoSkunkmanAIPlayer apoPlayer) {
         this.apoPlayer = apoPlayer;
     }
 

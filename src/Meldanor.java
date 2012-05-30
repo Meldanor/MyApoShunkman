@@ -8,8 +8,6 @@
  * begegnen.
  */
 
-import java.io.File;
-
 import apoSkunkman.ai.ApoSkunkmanAI;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
