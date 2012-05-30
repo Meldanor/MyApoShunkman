@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import javax.imageio.ImageIO;
 
 import apoSkunkman.ApoSkunkmanConstants;
+import apoSkunkman.ApoSkunkmanImageContainer;
 import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
@@ -79,6 +80,10 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
         // TODO: Load the bridge textures
 //        brigdeStartImage = ImageIO.read(new File(Meldanor.DIR, "BLA"));
 //        brigdeCorpseImage = ImageIO.read(new File(Meldanor.DIR, "BLA2"));
+
+        // TODO: Load atomic bombs instead of skunks
+//        ApoSkunkmanImageContainer.iBomb = ImageIO.read(new File(Meldanor.DIR, "TrollAtomicBomb.png"));
+//        TrollAtomicBombEntity.init(ImageIO.read(new File(Meldanor.DIR, "AtomicPreEffect.png")));
     }
 
     private BufferedImage brigdeStartImage;
@@ -150,6 +155,11 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
             e.printStackTrace();
         }
 
+    }
+
+    private void layBomb(Point p) throws Exception {
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        level.getLevel()[p.y][p.x] = new TrollAtomicBombEntity(p.x, p.y, level, apoPlayer.getPlayer());
     }
 
     private void changeBackground(BufferedImage tiles) throws Exception {
