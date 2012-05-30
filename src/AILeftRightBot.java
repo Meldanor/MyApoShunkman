@@ -111,12 +111,18 @@ public class AILeftRightBot implements Tickable {
                 currentGoal = goals.poll();
                 ((WalkGoal) currentGoal).calculateWay(apoLevel);
             } else {
-                currentGoal = new PlantBombGoal(melPlayer.getPosition(), apoLevel, melPlayer);
+                currentGoal = new PlantBombGoal(getEnemyPosition(), apoLevel, melPlayer);
             }
 
         }
         currentGoal.process();
 
+    }
+
+    private Point getEnemyPosition() {
+        ApoSkunkmanAIEnemy enemy = apoLevel.getEnemies()[0];
+
+        return new Point((int) enemy.getX(), (int) enemy.getY());
     }
 
     // CHECK CURRENT LEVEL FOR BOMBS
