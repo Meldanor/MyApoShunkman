@@ -17,7 +17,7 @@ import apoSkunkman.entity.ApoSkunkmanEntity;
 public class TrollBackgroundEntity extends ApoSkunkmanEntity {
     
     public TrollBackgroundEntity(BufferedImage tiles, float x, float y) {
-        super(tiles, x * ApoSkunkmanConstants.TILE_SIZE, y * ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, 4, 1000L, 1, false);
+        super(tiles, x * ApoSkunkmanConstants.TILE_SIZE, y * ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, 2, 1000L, 1, false);
     }
 
     @Override
