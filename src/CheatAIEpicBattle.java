@@ -35,6 +35,8 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
     private Field apoLevelField;
     private Field apoPlayerField;
 
+    private boolean isLeftOne;
+
     // Idee: Beide KIs stehen sich gegenüber und zwischen beide ist eine Brücke.
     // Der Hintergrund wechselt ca. alle 10
     @Override
@@ -47,6 +49,7 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
 
             if (!preparedBackground) {
                 changeBackground(spaceTiles);
+                createBridge();
                 preparedBackground = true;
             }
 
@@ -55,25 +58,6 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
             e.printStackTrace();
         }
 
-    }
-
-    private void setStart() throws Exception {
-        Point first = new Point(2, 7);
-        Point second = new Point(12, 7);
-
-        ApoSkunkmanAIEnemy enemy = apoLevel.getEnemies()[0];
-
-        Point target;
-
-        // CHECK WHETHER THE OTHER AI WAS FIRST
-        if (enemy.getX() == first.x)
-            target = second;
-        else
-            target = first;
-
-        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
-        player.setX(target.x * ApoSkunkmanConstants.TILE_SIZE);
-        player.setY(target.y * ApoSkunkmanConstants.TILE_SIZE);
     }
 
     private void getFields() throws Exception {
@@ -91,6 +75,51 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
 
     private void loadPics() throws Exception {
         spaceTiles = ImageIO.read(new File(Meldanor.DIR, "Space.png"));
+
+        // TODO: Load the bridge textures
+//        brigdeStartImage = ImageIO.read(new File(Meldanor.DIR, "BLA"));
+//        brigdeCorpseImage = ImageIO.read(new File(Meldanor.DIR, "BLA2"));
+    }
+
+    private BufferedImage brigdeStartImage;
+    private BufferedImage brigdeCorpseImage;
+
+    private void createBridge() throws Exception {
+
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        ApoSkunkmanEntity[][] entities = level.getLevel();
+
+        int y = 7;
+
+        // CREATE THE START OF THE BRIDGE
+        entities[y][1] = new TrollBridgeEntity(brigdeStartImage, 1, y);
+        entities[y][13] = new TrollBridgeEntity(brigdeStartImage, 13, y);
+
+        // CREATE THE CORPUS OF THE BRIDGE
+        for (int x = 2; x <= 12; ++x)
+            entities[y][x] = new TrollBridgeEntity(brigdeCorpseImage, x, y);
+    }
+
+    private void setStart() throws Exception {
+        Point first = new Point(2, 7);
+        Point second = new Point(12, 7);
+
+        ApoSkunkmanAIEnemy enemy = apoLevel.getEnemies()[0];
+
+        Point target;
+
+        // CHECK WHETHER THE OTHER AI WAS FIRST
+        if (enemy.getX() == first.x) {
+            target = second;
+            isLeftOne = false;
+        } else {
+            target = first;
+            isLeftOne = true;
+        }
+
+        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
+        player.setX(target.x * ApoSkunkmanConstants.TILE_SIZE);
+        player.setY(target.y * ApoSkunkmanConstants.TILE_SIZE);
     }
 
     @Override
@@ -116,7 +145,7 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
 
     private void handleLevel(long delta) {
         try {
-            apoPlayer.movePlayerDown();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
