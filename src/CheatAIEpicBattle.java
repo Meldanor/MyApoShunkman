@@ -77,8 +77,8 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
 
     private void loadPics() throws Exception {
 
-        ApoSkunkmanImageContainer.iBomb = ImageIO.read(new File(Meldanor.DIR, "TrollAtomicBomb.png"));
-        TrollAtomicBombEntity.init(ImageIO.read(new File(Meldanor.DIR, "AtomicPreEffect.png")));
+        ApoSkunkmanImageContainer.iBomb = ImageIO.read(new File(MeldanorTroll.DIR, "TrollAtomicBomb.png"));
+        TrollAtomicBombEntity.init(ImageIO.read(new File(MeldanorTroll.DIR, "AtomicPreEffect.png")));
     }
 
     private void setStart() throws Exception {

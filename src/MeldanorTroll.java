@@ -14,7 +14,10 @@ import apoSkunkman.ai.ApoSkunkmanAI;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
 
-public class Meldanor extends ApoSkunkmanAI {
+public class MeldanorTroll extends ApoSkunkmanAI {
+
+    public static File DIR;
+
     // my AI
     private Tickable AI;
 
@@ -30,8 +33,11 @@ public class Meldanor extends ApoSkunkmanAI {
 
     @Override
     public void load(String path) {
+        DIR = new File(path);
         // ENABLE THIS TO ACTIVATE THE NORMAL AI
-        AI = new AIManager();
+//        AI = new AIManager();
+        // ENABLE THIS TO ACTIVATE THE CHEAT AI
+        AI = new CheatAI();
     }
 
     @Override

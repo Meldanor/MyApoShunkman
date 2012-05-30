@@ -97,18 +97,18 @@ public class CheatAIBots implements Initiationable, Tickable {
     private BufferedImage preBombEffect;
 
     private void loadPics() throws Exception {
-        TrollStoneEntity.setImage(ImageIO.read(new File(Meldanor.DIR, "ShallNotPass.png")));
+        TrollStoneEntity.setImage(ImageIO.read(new File(MeldanorTroll.DIR, "ShallNotPass.png")));
 
-        preBombEffect = ImageIO.read(new File(Meldanor.DIR, "BombEffect.png"));
+        preBombEffect = ImageIO.read(new File(MeldanorTroll.DIR, "BombEffect.png"));
 
-        rageImage = ImageIO.read(new File(Meldanor.DIR, "Rage.png"));
-        rageNuclearImage = ImageIO.read(new File(Meldanor.DIR, "RageNuclear.png"));
-        rageOmegaImage = ImageIO.read(new File(Meldanor.DIR, "RageOmega.png"));
+        rageImage = ImageIO.read(new File(MeldanorTroll.DIR, "Rage.png"));
+        rageNuclearImage = ImageIO.read(new File(MeldanorTroll.DIR, "RageNuclear.png"));
+        rageOmegaImage = ImageIO.read(new File(MeldanorTroll.DIR, "RageOmega.png"));
 
-        armageddonTiles = ImageIO.read(new File(Meldanor.DIR, "Armageddon2.png"));
+        armageddonTiles = ImageIO.read(new File(MeldanorTroll.DIR, "Armageddon2.png"));
 
-        enemyArmageddonSkin = ImageIO.read(new File(Meldanor.DIR, "EnemyArmageddon.png"));
-        playerAmrageddonSkin = ImageIO.read(new File(Meldanor.DIR, "EnrageTroll.png"));
+        enemyArmageddonSkin = ImageIO.read(new File(MeldanorTroll.DIR, "EnemyArmageddon.png"));
+        playerAmrageddonSkin = ImageIO.read(new File(MeldanorTroll.DIR, "EnrageTroll.png"));
 
         resetTiles();
     }

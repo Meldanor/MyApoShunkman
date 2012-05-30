@@ -98,10 +98,10 @@ public class CheatAIGoalX implements Tickable, Initiationable {
 
     private void loadImages() throws Exception {
         // © http://26.media.tumblr.com/avatar_af220d6da0cf_128.png
-        replacedChestImage1 = ImageIO.read(new File(Meldanor.DIR, "YaoMing.png"));
+        replacedChestImage1 = ImageIO.read(new File(MeldanorTroll.DIR, "YaoMing.png"));
         replacedChestImage2 = horiziontalFlip(replacedChestImage1);
         // © http://alltheragefaces.com/img/faces/png/okay-okay-clean.png
-        finalChestImage = ImageIO.read(new File(Meldanor.DIR, "Okay.png"));
+        finalChestImage = ImageIO.read(new File(MeldanorTroll.DIR, "Okay.png"));
 
     }
 

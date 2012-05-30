@@ -92,10 +92,10 @@ public class CheatAIHuman implements Tickable, Initiationable {
     private BufferedImage portalEndImage;
 
     private void loadPics() throws Exception {
-        playerImage = ImageIO.read(new File(Meldanor.DIR, "GoodGuyGreg.png"));
+        playerImage = ImageIO.read(new File(MeldanorTroll.DIR, "GoodGuyGreg.png"));
 
-        portalStartImage = ImageIO.read(new File(Meldanor.DIR, "PortalStart.png"));
-        portalEndImage = ImageIO.read(new File(Meldanor.DIR, "PortalEnd.png"));
+        portalStartImage = ImageIO.read(new File(MeldanorTroll.DIR, "PortalStart.png"));
+        portalEndImage = ImageIO.read(new File(MeldanorTroll.DIR, "PortalEnd.png"));
     }
 
     public boolean isInit() {
