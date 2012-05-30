@@ -25,9 +25,9 @@ public class TrollAtomicBombEntity extends ApoSkunkmanEntity {
     private long layBombTimer;
 
     public TrollAtomicBombEntity(float x, float y, ApoSkunkmanLevel level, int playerId) {
-        super(bImage, x * ApoSkunkmanConstants.TILE_SIZE, y * ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, 4, 250L, 1, false);
+        super(bImage, x * ApoSkunkmanConstants.TILE_SIZE, y * ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, ApoSkunkmanConstants.TILE_SIZE, 4, 100L, 1, false);
         this.level = level;
-        layBombTimer = getTime() * (getTiles() + 1);
+        layBombTimer = getTime() * (getTiles());
         this.playerId = playerId;
     }
 

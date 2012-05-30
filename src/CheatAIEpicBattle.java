@@ -1,5 +1,4 @@
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Random;
@@ -7,6 +6,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import apoSkunkman.ApoSkunkmanConstants;
+import apoSkunkman.ApoSkunkmanImageContainer;
 import apoSkunkman.ai.ApoSkunkmanAIEnemy;
 import apoSkunkman.ai.ApoSkunkmanAILevel;
 import apoSkunkman.ai.ApoSkunkmanAIPlayer;
@@ -51,12 +51,15 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
             loadPics();
 
             if (!preparedBackground) {
-                changeBackground(spaceTiles);
-                createBridge();
                 preparedBackground = true;
+                prepareLevel();
             }
 
             setStart();
+
+            initPlayerValue();
+
+            isInit = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -72,39 +75,10 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
         apoPlayerField.setAccessible(true);
     }
 
-    // © Patrick Hoesly
-    // http://farm3.staticflickr.com/2737/4116782252_abf8819c39_o.jpg
-    private BufferedImage spaceTiles = null;
-
     private void loadPics() throws Exception {
-        spaceTiles = ImageIO.read(new File(Meldanor.DIR, "Space.png"));
 
-        // TODO: Load the bridge textures
-//        brigdeStartImage = ImageIO.read(new File(Meldanor.DIR, "BLA"));
-//        brigdeCorpseImage = ImageIO.read(new File(Meldanor.DIR, "BLA2"));
-
-        // TODO: Load atomic bombs instead of skunks
-//        ApoSkunkmanImageContainer.iBomb = ImageIO.read(new File(Meldanor.DIR, "TrollAtomicBomb.png"));
-//        TrollAtomicBombEntity.init(ImageIO.read(new File(Meldanor.DIR, "AtomicPreEffect.png")));
-    }
-
-    private BufferedImage brigdeStartImage;
-    private BufferedImage brigdeCorpseImage;
-
-    private void createBridge() throws Exception {
-
-        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
-        ApoSkunkmanEntity[][] entities = level.getLevel();
-
-        int y = 7;
-
-        // CREATE THE START OF THE BRIDGE
-        entities[y][1] = new TrollBridgeEntity(brigdeStartImage, 1, y);
-        entities[y][13] = new TrollBridgeEntity(brigdeStartImage, 13, y);
-
-        // CREATE THE CORPUS OF THE BRIDGE
-        for (int x = 2; x <= 12; ++x)
-            entities[y][x] = new TrollBridgeEntity(brigdeCorpseImage, x, y);
+        ApoSkunkmanImageContainer.iBomb = ImageIO.read(new File(Meldanor.DIR, "TrollAtomicBomb.png"));
+        TrollAtomicBombEntity.init(ImageIO.read(new File(Meldanor.DIR, "AtomicPreEffect.png")));
     }
 
     private void setStart() throws Exception {
@@ -129,6 +103,26 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
         player.setY(target.y * ApoSkunkmanConstants.TILE_SIZE);
     }
 
+    private void prepareLevel() throws Exception {
+
+        ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
+        ApoSkunkmanEntity[][] entities = level.getLevel();
+
+        for (int y = 1; y < entities.length - 1; ++y) {
+            for (int x = 1; x < entities[y].length - 1; ++x) {
+                entities[y][x] = null;
+            }
+        }
+
+        level.getGame().makeBackground(false, false, false, false);
+    }
+
+    private void initPlayerValue() throws Exception {
+        ApoSkunkmanPlayer player = (ApoSkunkmanPlayer) apoPlayerField.get(apoPlayer);
+        player.setCurWidth(ApoSkunkmanConstants.PLAYER_WIDTH_MAX);
+
+    }
+
     @Override
     public boolean isInit() {
         return isInit;
@@ -150,13 +144,23 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
         }
     }
 
-    private long dropBombTimer = 1000L;
+    private long dropBombTimer = 1000L + RAND.nextInt(500);
+
+    private long finishBattleTimer = 30000L;
+
+    private static boolean finished = false;
 
     private void handleLevel(long delta) {
         try {
 
+            if (finished)
+                return;
+
             if ((dropBombTimer -= delta) <= 0)
                 dropBomb();
+
+            if ((finishBattleTimer -= delta) <= 0)
+                finishBattle();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -180,7 +184,7 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
         // LAY BOMB
         layBomb(x, y);
 
-        dropBombTimer = 1500L;
+        dropBombTimer = 1500L + RAND.nextInt(500);
     }
 
     private void layBomb(int x, int y) throws Exception {
@@ -193,21 +197,27 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
         level.getLevel()[p.y][p.x] = new TrollAtomicBombEntity(p.x, p.y, level, apoPlayer.getPlayer());
     }
 
-    private void changeBackground(BufferedImage tiles) throws Exception {
+    private void finishBattle() throws Exception {
         ApoSkunkmanLevel level = (ApoSkunkmanLevel) apoLevelField.get(apoLevel);
-
         ApoSkunkmanEntity[][] entities = level.getLevel();
-        // REPLACE ALL IMAGES WITH THE ARMAGEDDON STYLE
-        for (int y = 0; y < entities.length; ++y) {
-            for (int x = 0; x < entities[y].length; ++x) {
-                if (y == 7)
-                    entities[y][x] = null;
-                else
-                    entities[y][x] = new TrollBackgroundEntity(tiles, x, y);
+
+        for (int y = 1; y < entities.length - 1; ++y) {
+            for (int x = 1; x < entities[y].length - 1; ++x) {
+                entities[y][x] = null;
+            }
+        }
+        for (int y = 1; y < entities.length - 1; ++y) {
+            for (int x = 1; x < entities[y].length - 1; ++x) {
+                if (!(y == 7 && (x == 2 || x == 12)))
+
+                    entities[y][x] = new TrollAtomicBombEntity(x, y, level, apoPlayer.getPlayer());
             }
         }
 
-        level.getGame().makeBackground(false, false, false, false);
+        CheatAI.displayMessage("Falscher Knopf...", apoLevel);
+
+        finished = true;
+
     }
 
 }
