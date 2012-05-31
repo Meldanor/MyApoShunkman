@@ -37,7 +37,7 @@ public class MeldanorTroll extends ApoSkunkmanAI {
         // ENABLE THIS TO ACTIVATE THE NORMAL AI
 //        AI = new AIManager();
         // ENABLE THIS TO ACTIVATE THE CHEAT AI
-        AI = new CheatAI();
+        AI = new CheatAIManager();
     }
 
     @Override

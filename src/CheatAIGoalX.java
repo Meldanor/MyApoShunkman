@@ -157,7 +157,7 @@ public class CheatAIGoalX implements Tickable, Initiationable {
 
     private void destroyEnemies(ApoSkunkmanAIEnemy[] enemies) throws Exception {
 
-        CheatAI.displayMessage("Du nicht nehmen Kerze!", apoLevel);
+        CheatAIManager.displayMessage("Du nicht nehmen Kerze!", apoLevel);
 
         ApoSkunkmanPlayer enemyPlayer = null;
         for (ApoSkunkmanAIEnemy enemy : enemies) {

@@ -23,7 +23,7 @@ import apoSkunkman.level.ApoSkunkmanLevel;
  * begegnen.
  */
 
-public class CheatAI implements Tickable, Initiationable {
+public class CheatAIManager implements Tickable, Initiationable {
 
     private boolean isInit = false;
     private Tickable cheatAIHandler;

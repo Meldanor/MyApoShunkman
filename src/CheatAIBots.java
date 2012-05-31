@@ -223,7 +223,7 @@ public class CheatAIBots implements Initiationable, Tickable {
                 // WHILE WE HAVE MERCY NO BOMBS ARE PLANTED NEAR THE BOTS
                 if (haveMercy && (mercyTimer -= delta) <= 0) {
                     haveMercy = false;
-                    CheatAI.displayMessage("NO MORE MERCY!", apoLevel);
+                    CheatAIManager.displayMessage("NO MORE MERCY!", apoLevel);
                 }
 
                 // CHANGE THE BOMB RADIUS
@@ -267,7 +267,7 @@ public class CheatAIBots implements Initiationable, Tickable {
         int bombRadius = RAND.nextInt(ApoSkunkmanConstants.PLAYER_WIDTH_MAX - ApoSkunkmanConstants.PLAYER_WIDTH_MIN) + ApoSkunkmanConstants.PLAYER_WIDTH_MIN;
         bombWidthField.set(player, bombRadius);
 
-        CheatAI.displayMessage("Have you heard? My bombs' radius is now " + bombRadius, apoLevel);
+        CheatAIManager.displayMessage("Have you heard? My bombs' radius is now " + bombRadius, apoLevel);
 
         // BOMB TIMER = 10000L UNTIL 12500
         bombWidthTimer = 10000L + RAND.nextInt(2500);
@@ -375,7 +375,7 @@ public class CheatAIBots implements Initiationable, Tickable {
             setEnemiesSpeed(0.0F);
             // REMOVE SKUNKMANS AND GOODIES AND REPLACE ENEMIES SKINS
             prepareArmageddon();
-            CheatAI.displayMessage("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!", apoLevel);
+            CheatAIManager.displayMessage("ENOUGH OF THIS! NOW YOU HAVE TO PAY FOR TROLLING ME!", apoLevel);
         }
 
         // FINISHED THE TRANSFORMATION

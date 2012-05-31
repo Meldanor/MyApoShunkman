@@ -48,7 +48,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
 
         try {
 
-            CheatAI.displayMessage("Hey Guys, do you need help?", apoLevel);
+            CheatAIManager.displayMessage("Hey Guys, do you need help?", apoLevel);
 
             getFields();
 
@@ -167,19 +167,19 @@ public class CheatAIHuman implements Tickable, Initiationable {
             playerName = ai.getPlayerName();
         switch (goodieID) {
             case ApoSkunkmanConstants.GOODIE_GOOD_WIDTH :
-                CheatAI.displayMessage(playerName + "'s bomb radius increased", apoLevel);
+                CheatAIManager.displayMessage(playerName + "'s bomb radius increased", apoLevel);
                 break;
 
             case ApoSkunkmanConstants.GOODIE_GOOD_SKUNKMAN :
-                CheatAI.displayMessage(playerName + "'s can lay a bomb more", apoLevel);
+                CheatAIManager.displayMessage(playerName + "'s can lay a bomb more", apoLevel);
                 break;
 
             case ApoSkunkmanConstants.GOODIE_GOOD_FAST :
-                CheatAI.displayMessage(playerName + "'s can run faster", apoLevel);
+                CheatAIManager.displayMessage(playerName + "'s can run faster", apoLevel);
                 break;
 
             case ApoSkunkmanConstants.GOODIE_GOOD_GOD :
-                CheatAI.displayMessage(playerName + "'s got gods bless", apoLevel);
+                CheatAIManager.displayMessage(playerName + "'s got gods bless", apoLevel);
                 break;
         }
 
@@ -208,7 +208,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
         }
 
         if (apoLevel.getEnemies().length == 1) {
-            CheatAI.displayMessage("You are the last one...I surrender", apoLevel);
+            CheatAIManager.displayMessage("You are the last one...I surrender", apoLevel);
             hasSurrender = true;
         }
 
@@ -314,7 +314,7 @@ public class CheatAIHuman implements Tickable, Initiationable {
                             if (bombCanHit(playerPosition, skunk, byteLevel)) {
                                 player = (ApoSkunkmanPlayer) enemyPlayerField.get(enemy);
                                 deleteBomb(skunk, player);
-                                CheatAI.displayMessage("You were in danger...I've deleted the bomb", apoLevel);
+                                CheatAIManager.displayMessage("You were in danger...I've deleted the bomb", apoLevel);
 
                             }
                         }

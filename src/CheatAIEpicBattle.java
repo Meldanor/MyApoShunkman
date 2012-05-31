@@ -214,7 +214,7 @@ public class CheatAIEpicBattle implements Tickable, Initiationable {
             }
         }
 
-        CheatAI.displayMessage("Falscher Knopf...", apoLevel);
+        CheatAIManager.displayMessage("Falscher Knopf...", apoLevel);
 
         finished = true;
 
