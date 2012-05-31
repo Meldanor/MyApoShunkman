@@ -102,7 +102,7 @@ public class CheatAIManager implements Tickable, Initiationable {
                 if (ai == null)
                     continue;
 
-                if (ai.getPlayerName().equalsIgnoreCase("Meldanor"))
+                if (ai.getPlayerName().equalsIgnoreCase("MeldanorTroll"))
                     return true;
             }
 
